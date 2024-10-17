@@ -1,12 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
 
+public enum WeaponMode
+{
+    None,
+    Pistol,
+    ShotGun,
+    Rifle,
+    SMG
+}
 public class StudyPlayerManager : MonoBehaviour
 {
     public static StudyPlayerManager Instance;
@@ -22,6 +27,7 @@ public class StudyPlayerManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    
 
     [Header("-----PlayerMove-----")]
     float playerSpeedWalk = 5f; //걷는 속도
@@ -61,29 +67,56 @@ public class StudyPlayerManager : MonoBehaviour
     [Header("-----Jump-----")]
     public float jumpHeight = 2f; //점프 높이
     bool isGround; //땅에 충돌 여부
-    public LayerMask groundLayer;
+    public LayerMask groundLayer; //땅의 레이어
 
     Animator animator;
-    float horizontal;
-    float vertical;
-    public Transform footPosition;
-    RaycastHit hit;
-    public Transform leftFoot;
-    public Transform rightFoot;
+    float horizontal; //X축 이동
+    float vertical; //Z축 이동
+    public Transform leftFoot; //왼쪽 발
+    public Transform rightFoot; //오른쪽 발
 
-    public float minMoveDistance = 0.01f;
-
-    bool IsLeftFootGround = false;
-    public bool IsRightFootGround = false;
+    bool isLeftFootGround = false;
+    public bool isRightFootGround = false;
 
     public float hp;
 
     Vector3 previousPosition;
 
     public float fallThreshold = -10f;
-    bool IsGameOver = false;
+    bool isGameOver = false;
     bool isJumping = false;
     Vector3 startPosition;
+    public bool isFire = false;
+
+    public Transform upperBody; //상체 본을 할당(Spine, UpperChest)
+    public float upperBodyRotationAngle = -30f; //상체 Aim 모드에서만 회전을 한다.
+    private quaternion originalUpperBodyRotation; //원래 상체 회전 값
+
+    public Transform aimTarget;
+
+    public float slowMotionScale = 0.5f;
+    private float defaltTimeScale = 1f;
+    private bool isSlowMotion = false;
+
+    private WeaponMode currentWeaponMode = WeaponMode.None;
+    public float maxShotDistance = 100f;
+    public LayerMask targetLayer;
+    public float delayShot = 1f;
+    public float recoilStrength = 2f; //반동의 세기
+    public float maxRecoilAngle = 10.0f; //반동의 최대 각도
+    private float currentRecoil = 0f; //현재 반동 값을 저장하는 변수
+    private int shotGunRayCount = 5; //샷건의 총알이 퍼지는 수
+    private float shotGunSpreadAngle = 10f; //샷건의 총알이 퍼지는 각도
+
+    //BoxCast 변수
+    public Vector3 boxSize = new Vector3(1, 1, 1); 
+    public float castDistance = 5f; //BoxCast 멀리 감지 거리
+    public LayerMask itemLayer; //아이템 레이어
+    public Transform itemGetPos; //BoxCast 위치
+    public float debugDuration = 2.0f; //디버그 라인 여부
+
+    bool isGetItemAction = false;
+
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -100,26 +133,31 @@ public class StudyPlayerManager : MonoBehaviour
         startPosition = transform.position + Vector3.up;
         previousPosition = transform.position; //시작시 현재 위치를 이전 위치로 초기화
         animator.SetLayerWeight(1, 0);
+
+        if(upperBody != null)
+        {
+            originalUpperBodyRotation = upperBody.localRotation;
+        }
     }
     private void Update()
     {
-        if (transform.position.y < fallThreshold && !IsGameOver)
+        if (transform.position.y < fallThreshold && !isGameOver)
         {
             GameOver();
         }
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
-        if(!IsGameOver)
-        {
+        if(!isGameOver)
+        {     
             RunAction();
 
-            bool isMoving = characterController.velocity.magnitude > 0.1f;
-            Debug.DrawRay(footPosition.position, Vector3.down * 0.2f, Color.red);
+            //bool isMoving = characterController.velocity.magnitude > 0.1f;
             if (horizontal != 0 || vertical != 0)
             {
-                //StartCoroutine(FootStepSound());
+                FootStepSound();
             }
-
+            //현재 위치를 이전 위치로 저장(다음 프레임에서 비교하기위함)
+            previousPosition = transform.position;
 
             if (Input.GetKeyDown(KeyCode.V)) //V키로 1인칭/3인칭 전환
             {
@@ -143,60 +181,52 @@ public class StudyPlayerManager : MonoBehaviour
             }
             ZoomMouseRightButton(); //오른쪽 마우스버튼으로 줌
 
-            Jump(); //점프
-            Fire();
-        }
-        
+            FireWeapon();
+                if(Input.GetKeyDown(KeyCode.Q))
+                {
+                    isSlowMotion = !isSlowMotion;
+                    ToggleSlowMotion();
+                }
+            ChangeWeapon();
+            if(currentRecoil > 0) //반동으로 초점이 어긋나면 원래 초점으로 돌아오는 기능
+            {
+                currentRecoil -= recoilStrength * Time.deltaTime;
 
+                currentRecoil = Mathf.Clamp(currentRecoil,0,maxRecoilAngle);
+            }
+            if(Input.GetKeyDown(KeyCode.E))
+            {
+                GetItem();
+            }
+            Jump(); //점프
+        }     
+    }
+    private void LateUpdate()
+    {
+        if(isZoomed)
+        {
+            if(upperBody != null)
+            {
+                upperBody.localRotation = quaternion.Euler(upperBodyRotationAngle,0,0);
+            }
+        }
+        else
+        {
+            if (upperBody != null)
+            {
+                upperBody.localRotation = originalUpperBodyRotation;
+            }
+        }
     }
     private void FixedUpdate()
     {
         
     }
-    IEnumerator FootStepSound()
+    void UpdateAimTarget() //플레이어가 바라보는 방향
     {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         
-        if (Physics.Raycast(footPosition.position, Vector3.down, out hit, 0.1f, groundLayer)) ;
-        {
-            if (hit.collider == null)
-            {
-
-            }
-            else
-            {
-                
-                if (hit.collider.tag == "Metal")
-                {
-                    StudySoundManager.Instance.PlaySFX("MetalFootStep");
-                }
-                else if (hit.collider.tag == "Snow")
-                {
-                    StudySoundManager.Instance.PlaySFX("SnowFootStep");
-                }
-                else
-                {
-                    StudySoundManager.Instance.PlaySFX("DefaltFootStep");
-                }
-            }
-
-        }
-        yield return new WaitForSeconds(1.0f);
-    }
-    void RunAction()
-    {
-        animator.SetFloat("Horizontal", horizontal);
-        animator.SetFloat("Vertical", vertical);
-
-        if (Input.GetKey(KeyCode.LeftShift)) //애니메이션을 통한 달리기 구현
-        {
-            animator.SetBool("isRun", true);
-            currentSpeed = playerSpeedRun;
-        }
-        if (Input.GetKeyUp(KeyCode.LeftShift))
-        {
-            animator.SetBool("isRun", false);
-            currentSpeed = playerSpeedWalk;
-        }
+        aimTarget.position = ray.GetPoint(10);
     }
     void FirstPersonMovement() //1인칭
     {
@@ -230,7 +260,7 @@ public class StudyPlayerManager : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, yaw, 0);
         mainCamera.transform.rotation = Quaternion.Euler(pitch, yaw, 0);
     }
-    void UpdateCameraPositionRotater()//카메라 위치 오른쪽에 있음
+    void UpdateCameraPositionRotater()//플레이어가 직접 회전
     {
         transform.rotation = Quaternion.Euler(0, yaw, 0);
         Vector3 direction = new Vector3(0, 0, -currentDistance);
@@ -241,8 +271,10 @@ public class StudyPlayerManager : MonoBehaviour
 
         //카메라가 플레이어의 위치를 따라가도록 설정
         cameraTransform.LookAt(playerLookObj.position + new Vector3(0, thirdPersonOffset.y, 0));
+
+        UpdateAimTarget();
     }
-    void UpdateCameraPosition()// 카메라 위치 
+    void UpdateCameraPosition()// 카메라가 플레이어 주위를 회전 
     {   
         Vector3 direction = new Vector3(0,0, -currentDistance); //카메라 거리 설정
         Quaternion rotation = Quaternion.Euler(pitch,yaw, 0);
@@ -272,7 +304,6 @@ public class StudyPlayerManager : MonoBehaviour
             animator.SetTrigger("JumpUp");
             isJumping = true;
         }
-
         velocity.y += gravity * Time.deltaTime;
     }
     bool CheckIfGround()// 레이캐스트로 바닥 확인
@@ -300,14 +331,58 @@ public class StudyPlayerManager : MonoBehaviour
         //}
         //return false;
     }
+    void RunAction() //뛰는 기능
+    {
+        animator.SetFloat("Horizontal", horizontal);
+        animator.SetFloat("Vertical", vertical);
+
+        if (Input.GetKey(KeyCode.LeftShift)) //애니메이션을 통한 달리기 구현
+        {
+            animator.SetBool("isRun", true);
+            currentSpeed = playerSpeedRun;
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            animator.SetBool("isRun", false);
+            currentSpeed = playerSpeedWalk;
+        }
+    }
+    void FootStepSound() //발소리
+    {
+        bool leftHit = CheckGround(leftFoot);
+        bool rightHit = CheckGround(rightFoot);
+
+        if(leftHit && !isLeftFootGround)
+        {
+            if (StudySoundManager.Instance.SFXAudioSourse.isPlaying) return;
+            StudySoundManager.Instance.PlaySFX("DefaltFootStep");
+        }
+        if(rightHit && !isRightFootGround)
+        {
+            if (StudySoundManager.Instance.SFXAudioSourse.isPlaying) return;
+            StudySoundManager.Instance.PlaySFX("DefaltFootStep");
+        }
+        //현재 상태를 다음 프레임과 비교하기 위해 저장
+        isLeftFootGround = leftHit;
+        isRightFootGround = rightHit;
+    }
+    bool CheckGround(Transform foot) //발이 땅에 닿았는지 체크
+    {
+        Vector3 rayStart = foot.position + Vector3.up * 0.05f;
+
+        bool hit = Physics.Raycast(rayStart, Vector3.down, 0.1f);
+
+        Debug.DrawRay(rayStart,Vector3.down*0.1f,hit ? Color.green : Color.red);
+
+        return hit;
+    }
     void ZoomMouseRightButton()// 마우스 오른쪽 버튼으로 줌
     {
         if (Input.GetMouseButtonDown(1) && !isZoomed) //오른쪽 마우스 버튼을 눌렀을 때
         {
             isZoomed = true;
-            animator.SetLayerWeight(1, 1);
-
-            animator.Play("PistolAim"); //디폴트지만 만에 하나를 위해
+            
+            AimWeapon();
             
             if (zoomCoroutine != null)
             {
@@ -355,13 +430,6 @@ public class StudyPlayerManager : MonoBehaviour
     {
         targetFov = fov;
     }
-    void Fire()
-    {
-        if (Input.GetMouseButtonDown(0) && isZoomed)
-        {
-            animator.SetTrigger("Fire");
-        }
-    }
     IEnumerator ZoomCamera(float targetDistance)
     {
         while(Mathf.Abs(currentDistance-targetDistance) > 0.01f)
@@ -380,21 +448,210 @@ public class StudyPlayerManager : MonoBehaviour
         }
         mainCamera.fieldOfView = targetFov;
     }
-
-    void GameOver()
+    void FireWeapon() //총에 따라 달라지게하는 기능
     {
-        IsGameOver = true;
+        if (Input.GetMouseButtonDown(0) && isZoomed && !isFire)
+        {
+            if (currentWeaponMode == WeaponMode.Pistol)
+            {
+                FirePistol();
+            }
+            else if (currentWeaponMode == WeaponMode.ShotGun)
+            {
+                FireShotGun();
+            }
+            else if(currentWeaponMode == WeaponMode.Rifle)
+            {
+                FireRifle();
+            }
+            else if(currentWeaponMode == WeaponMode.SMG)
+            {
+                FireSMG();
+            }
+            isFire = true;
+            //animator.SetTrigger("Fire");
+            StartCoroutine(ShotDelay(delayShot,isFire));
+            ApplyRecoil();
+        }
+    }
+    void ApplyRecoil() //반동 기능
+    {
+        //현재 카메라의 월드 회전을 가져옴
+        Quaternion currentRotation = Camera.main.transform.rotation;
+
+        //반동을 계산하여 X축(상하) 회전에 추가(위로 올라가는 반동)
+        Quaternion recoilRotation = quaternion.Euler(-currentRecoil, 0, 0);
+
+        //현재 회전 값에 반동을 곱하여 새로운 회전값을 적용
+        Camera.main.transform.rotation = currentRotation * recoilRotation;
+
+        //반동 값을 증가시킴
+        currentRecoil += recoilStrength;
+
+        //반동 값을 MAX에 맞춰서 제한
+        currentRecoil = Mathf.Clamp(currentRecoil, 0, maxRecoilAngle);
+
+    }
+    void FirePistol()
+    {
+        animator.SetTrigger("FirePistol");
+        StudySoundManager.Instance.PlaySFX("FirePistol");
+
+        RaycastHit hit;
+        Vector3 orizin = Camera.main.transform.position;
+        Vector2 direction = Camera.main.transform.forward;
+
+        maxShotDistance = 100f;
+        Debug.DrawRay(orizin, direction * maxShotDistance, Color.red, 1.0f);
+
+        if(Physics.Raycast(orizin,direction * maxShotDistance,out hit, targetLayer))
+        {
+            Debug.Log("Hit : " + hit.collider.name);
+        }
+    }
+    void FireShotGun()
+    {
+        animator.SetTrigger("FireShotGun");
+        StudySoundManager.Instance.PlaySFX("FireShotGun");
+
+        maxShotDistance = 250f;
+
+        for (int i = 0; i < shotGunRayCount; i++)
+        {
+            RaycastHit hit;
+
+            Vector3 orizin = Camera.main.transform.position;
+
+            float spreadX = UnityEngine.Random.Range(-shotGunSpreadAngle, shotGunSpreadAngle);
+            float spreadY = UnityEngine.Random.Range(-shotGunSpreadAngle, shotGunSpreadAngle);
+
+            Vector3 spreadDirection = Quaternion.Euler(spreadX, spreadY, 0) * Camera.main.transform.forward;
+
+            Debug.DrawRay(orizin, spreadDirection * maxShotDistance, Color.red, 1.0f);
+            if (Physics.Raycast(orizin, spreadDirection * maxShotDistance, out hit, targetLayer))
+            {
+                Debug.Log("Hit : " + hit.collider.name);
+            }
+        }
+    }
+    void FireRifle()
+    {
+        animator.SetTrigger("FireRifle");
+        StudySoundManager.Instance.PlaySFX("FireRifle");
+
+        RaycastHit hit;
+        Vector3 orizin = Camera.main.transform.position;
+        Vector2 direction = Camera.main.transform.forward;
+
+        maxShotDistance = 1000f;
+
+        Debug.DrawRay(orizin, direction * maxShotDistance, Color.red, 1.0f);
+
+        if (Physics.Raycast(orizin, direction * maxShotDistance, out hit, targetLayer))
+        {
+            Debug.Log("Hit : " + hit.collider.name);
+        }
+    }
+    void FireSMG()
+    {
+        animator.SetTrigger("FireSMG");
+        StudySoundManager.Instance.PlaySFX("FireSMG");
+
+        RaycastHit hit;
+        Vector3 orizin = Camera.main.transform.position;
+        Vector2 direction = Camera.main.transform.forward;
+
+        maxShotDistance = 200f;
+
+        Debug.DrawRay(orizin, direction * maxShotDistance, Color.red, 1.0f);
+
+        if (Physics.Raycast(orizin, direction * maxShotDistance, out hit, targetLayer))
+        {
+            Debug.Log("Hit : " + hit.collider.name);
+        }
+    }
+    void AimWeapon() //웨폰에 따라 에임이 달라지는 기능
+    {
+        animator.SetLayerWeight(1, 1);
+
+        
+        if (currentWeaponMode == WeaponMode.Pistol)
+        {
+            AimPistol();
+        }
+        else if (currentWeaponMode == WeaponMode.ShotGun)
+        {
+            AimShotGun();
+        }
+        else if (currentWeaponMode == WeaponMode.Rifle)
+        {
+            AimRifle();
+        }
+        else if (currentWeaponMode == WeaponMode.SMG)
+        {
+            AimSMG();
+        }
+    }
+    void AimPistol()
+    {
+        animator.Play("PistolAim");
+    }
+    void AimShotGun()
+    {
+        animator.Play("ShotgunAim");
+    }
+    void AimRifle()
+    {
+        animator.Play("RifleAim");
+    }
+    void AimSMG()
+    {
+        animator.Play("SMGAim");
+    }
+    IEnumerator ShotDelay(float delay, bool isbool) //총 쏘고난 후 딜레이
+    {
+        Debug.Log(delay);
+        yield return new WaitForSeconds(delay);
+        isbool = false;
+        Debug.Log(isbool);
+    }
+    void ChangeWeapon() //1,2,3,4로 무기 변경
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            currentWeaponMode = WeaponMode.Pistol;
+            Debug.Log("Pistol Change");
+        }
+        else if(Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            currentWeaponMode = WeaponMode.ShotGun;
+            Debug.Log("ShotGun Change");
+        }
+        else if(Input.GetKeyDown(KeyCode.Alpha3))
+        { 
+            currentWeaponMode= WeaponMode.Rifle;
+            Debug.Log("Rifle Change");
+        }
+        else if(Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            currentWeaponMode = WeaponMode.SMG;
+            Debug.Log("SMG Change");
+        }
+    }
+    void GameOver() // 게임오버
+    {
+        isGameOver = true;
         transform.position = startPosition;
         Invoke("RestartGame", 2.0f);
     }
-    void RestartGame()
+    void RestartGame() //리스타트
     {
         transform.position = new Vector3(startPosition.x,startPosition.y,startPosition.z);
         Debug.Log(startPosition);
-        IsGameOver = false;
+        isGameOver = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage) //데미지를 입는 기능
     {
         hp -= damage;
         hp = Mathf.Max(hp, 0);
@@ -403,4 +660,74 @@ public class StudyPlayerManager : MonoBehaviour
             GameOver();
         }
     }
+    void ToggleSlowMotion() //슬로우모션 기능
+    {
+        if(!isSlowMotion)
+        {
+            Time.timeScale = defaltTimeScale;
+            currentSpeed /= 2;
+            Debug.Log("슬로우 모션 해제");
+        }
+        else
+        {
+            Time.timeScale = slowMotionScale;
+            currentSpeed *= 2;
+            Debug.Log("슬로우 모션 활성화");
+        }
+    }
+    void GetItem()
+    {
+        isGetItemAction = true;
+        animator.SetTrigger("PickUp");
+        bool isPickUp = animator.GetCurrentAnimatorStateInfo(0).IsName("PickUp");
+        //if (!isPickUp) //알아서 하기 잘 발동할 장소에 두기
+        //{
+        //    isGetItemAction = false;
+        //}
+        StartCoroutine(ShotDelay(animator.GetCurrentAnimatorStateInfo(0).length/2, isGetItemAction));
+        Debug.Log(animator.GetCurrentAnimatorStateInfo(0).length);
+        RaycastHit[] hits;
+        Vector3 orizin = itemGetPos.position;
+        Vector3 direction = itemGetPos.forward;
+        //Vector3 direction = Camera.main.transform.forward;
+
+        hits = Physics.BoxCastAll(orizin,boxSize/2,direction,quaternion.identity,castDistance,itemLayer);
+
+        DebugBoxCast(orizin, direction);
+        foreach (RaycastHit hit in hits) 
+        {
+            Debug.Log("아이템 감지" + hit.collider.name);
+            hit.collider.gameObject.SetActive(false);
+        }
+    }
+    void DebugBoxCast(Vector3 orizin, Vector3 direction)
+    {
+        Vector3 enPoint = orizin + direction * maxShotDistance;
+        //BoxCast의 모양을 그리기 위한 8개의 모서리 좌표 계산
+        Vector3[] corners = new Vector3[8];
+        corners[0] = orizin + new Vector3(-boxSize.x,-boxSize.y,-boxSize.z) /2;
+        corners[1] = orizin + new Vector3(boxSize.x,-boxSize.y,-boxSize.z) /2;
+        corners[2] = orizin + new Vector3(-boxSize.x,boxSize.y,-boxSize.z) /2;
+        corners[3] = orizin + new Vector3(boxSize.x,boxSize.y,-boxSize.z) /2;
+        corners[4] = orizin + new Vector3(-boxSize.x,-boxSize.y,boxSize.z) /2;
+        corners[5] = orizin + new Vector3(boxSize.x,-boxSize.y,boxSize.z) /2;
+        corners[6] = orizin + new Vector3(-boxSize.x,boxSize.y,boxSize.z) /2;
+        corners[7] = orizin + new Vector3(boxSize.x,boxSize.y,boxSize.z) /2;
+        //시작점 박스의 12개 모서리를 그리기
+        Debug.DrawLine(corners[0], corners[1], Color.green, debugDuration);
+        Debug.DrawLine(corners[1], corners[3], Color.green, debugDuration);
+        Debug.DrawLine(corners[3], corners[2], Color.green, debugDuration);
+        Debug.DrawLine(corners[2], corners[0], Color.green, debugDuration);
+        Debug.DrawLine(corners[4], corners[5], Color.green, debugDuration);
+        Debug.DrawLine(corners[5], corners[7], Color.green, debugDuration);
+        Debug.DrawLine(corners[7], corners[6], Color.green, debugDuration);
+        Debug.DrawLine(corners[6], corners[4], Color.green, debugDuration);
+        Debug.DrawLine(corners[0], corners[4], Color.green, debugDuration);
+        Debug.DrawLine(corners[1], corners[5], Color.green, debugDuration);
+        Debug.DrawLine(corners[2], corners[6], Color.green, debugDuration);
+        Debug.DrawLine(corners[3], corners[7], Color.green, debugDuration);
+
+        Debug.DrawRay(orizin, direction * maxShotDistance, Color.green, debugDuration);
+    }
+    
 }
