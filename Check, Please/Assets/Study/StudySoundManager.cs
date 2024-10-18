@@ -65,12 +65,11 @@ public class StudySoundManager : MonoBehaviour
             Debug.LogError($"BGM : {name}가 없습니다.");
         }
     }
-    public void PlaySFX(string name)
+    public void PlaySFX(string name, Vector3 position)
     {
         if (SFXClips.ContainsKey(name))
         {
-            SFXAudioSourse.clip = SFXClips[name];
-            SFXAudioSourse.Play();
+            AudioSource.PlayClipAtPoint(SFXClips[name], position);
         }
         else
         {
