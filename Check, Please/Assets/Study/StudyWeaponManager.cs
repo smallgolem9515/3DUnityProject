@@ -21,8 +21,8 @@ public class StudyWeaponManager : MonoBehaviour
     private Dictionary<Weapon.WeaponType, GameObject> weaponInventory = new Dictionary<Weapon.WeaponType, GameObject>();
 
     private GameObject currentWeapon; //현재 장착된 무기
-    private Weapon.WeaponType currentWeaponType; //현재 무기 타입
-
+    private Weapon.WeaponType currentWeaponType = Weapon.WeaponType.None; //현재 무기 타입
+    private Weapon currentWeaponComponent; //현재 무기의 Weapon 컴포넌트(EffectPos를 가져오기 위해 사용)
 
 
     private void Awake()
@@ -44,7 +44,6 @@ public class StudyWeaponManager : MonoBehaviour
             }
         }
     }
-    
     public void EquipWeapon(Weapon.WeaponType weaponType) //무기를 장착하는 함수
     {
         if(!weaponInventory.ContainsKey(weaponType)) //예외처리
@@ -62,6 +61,8 @@ public class StudyWeaponManager : MonoBehaviour
 
         currentWeapon = newWeapon;
         currentWeaponType = weaponType;
+
+        currentWeaponComponent = newWeapon.GetComponent<Weapon>();
 
         currentWeapon.SetActive(true);
         Debug.Log($"{weaponType} 무기 장착");
@@ -81,5 +82,9 @@ public class StudyWeaponManager : MonoBehaviour
     public Weapon.WeaponType GetCurrentWeaponType()
     {
         return currentWeaponType;
+    }
+    public Weapon GetCurrentWeaponComponent()
+    {
+        return currentWeaponComponent;
     }
 }

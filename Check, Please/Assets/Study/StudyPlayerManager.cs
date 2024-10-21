@@ -28,7 +28,7 @@ public class StudyPlayerManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
+
 
     [Header("-----PlayerMove-----")]
     float playerSpeedWalk = 5f; //걷는 속도
@@ -39,9 +39,11 @@ public class StudyPlayerManager : MonoBehaviour
     Vector3 velocity; //현재 속도 저장
     CharacterController characterController; //리지드바디는 3D에서 이런저런 문제가 있어서 캐릭터 컨트롤러를 사용한다.
     //단 중력이 없어서 따로 설정해야한다.
+    public float damageDelay = 2.0f;
 
     [Header("-----PlayerBool-----")]
-    public bool isFire = false;
+    public bool isFire = true;
+    public bool isDamage = false;
     bool isGameOver = false;
     bool isJumping = false;
 
@@ -85,11 +87,8 @@ public class StudyPlayerManager : MonoBehaviour
     bool isLeftFootGround = false;
     bool isRightFootGround = false;
 
-
     Vector3 previousPosition;
-
     public float fallThreshold = -10f;
-    
     Vector3 startPosition;
 
     [Header("-----UpperBody-----")]
@@ -109,7 +108,7 @@ public class StudyPlayerManager : MonoBehaviour
     public LayerMask targetLayer;
 
     [Header("-----WeaponSetting-----")]
-    public float delayShot = 1f;
+
     public float recoilStrength = 2f; //반동의 세기
     public float maxRecoilAngle = 10.0f; //반동의 최대 각도
     private float currentRecoil = 0f; //현재 반동 값을 저장하는 변수
@@ -118,7 +117,7 @@ public class StudyPlayerManager : MonoBehaviour
 
     //BoxCast 변수
     [Header("-----BoxCast-----")]
-    public Vector3 boxSize = new Vector3(1, 1, 1); 
+    public Vector3 boxSize = new Vector3(1, 1, 1);
     public float castDistance = 5f; //BoxCast 멀리 감지 거리
     public LayerMask itemLayer; //아이템 레이어
     public Transform itemGetPos; //BoxCast 위치
@@ -127,6 +126,11 @@ public class StudyPlayerManager : MonoBehaviour
     public GameObject crossHair;
     public GameObject noneCrossHair;
     bool isGetItemAction = false;
+
+    private float fireDelay = 0.1f; //발사 딜레이
+
+    public Light flashLight;
+    private bool isFlashLight = false;
 
     private void Start()
     {
@@ -145,10 +149,11 @@ public class StudyPlayerManager : MonoBehaviour
         previousPosition = transform.position; //시작시 현재 위치를 이전 위치로 초기화
         animator.SetLayerWeight(1, 0);
 
-        if(upperBody != null)
+        if (upperBody != null)
         {
             originalUpperBodyRotation = upperBody.localRotation;
         }
+        flashLight.enabled = false;
     }
     private void Update()
     {
@@ -158,8 +163,8 @@ public class StudyPlayerManager : MonoBehaviour
         }
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
-        if(!isGameOver)
-        {     
+        if (!isGameOver)
+        {
 
             //bool isMoving = characterController.velocity.magnitude > 0.1f;
             if (horizontal != 0 || vertical != 0)
@@ -195,30 +200,34 @@ public class StudyPlayerManager : MonoBehaviour
                 rotaterAroundPlayer = !rotaterAroundPlayer;
                 Debug.Log(rotaterAroundPlayer ? "카메라가 플레이어 주위를 회전" : "플레이어가 직접 회전");
             }
-            if(currentRecoil > 0) //반동으로 초점이 어긋나면 원래 초점으로 돌아오는 기능
+            if (currentRecoil > 0) //반동으로 초점이 어긋나면 원래 초점으로 돌아오는 기능
             {
                 currentRecoil -= recoilStrength * Time.deltaTime;
 
-                currentRecoil = Mathf.Clamp(currentRecoil,0,maxRecoilAngle);
+                currentRecoil = Mathf.Clamp(currentRecoil, 0, maxRecoilAngle);
             }
-            if(Input.GetKeyDown(KeyCode.Q))
+            if (Input.GetKeyDown(KeyCode.Q))
             {
                 isSlowMotion = !isSlowMotion;
                 ToggleSlowMotion();
             }
-            if(Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.E))
             {
                 GetItem();
             }
-        }     
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                ToggleFlashLight();
+            }
+        }
     }
     private void LateUpdate()
     {
-        if(isZoomed)
+        if (isZoomed)
         {
-            if(upperBody != null)
+            if (upperBody != null)
             {
-                upperBody.localRotation = quaternion.Euler(upperBodyRotationAngle,0,0);
+                upperBody.localRotation = quaternion.Euler(upperBodyRotationAngle, 0, 0);
             }
         }
         else
@@ -231,12 +240,12 @@ public class StudyPlayerManager : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        
+
     }
     void UpdateAimTarget() //플레이어가 바라보는 방향
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        
+
         aimTarget.position = ray.GetPoint(10);
     }
     void FirstPersonMovement() //1인칭
@@ -249,13 +258,13 @@ public class StudyPlayerManager : MonoBehaviour
     {
         Vector3 move = transform.right * horizontal + transform.forward * vertical + transform.up * velocity.y;
         characterController.Move(move * currentSpeed * Time.deltaTime);
-        if(rotaterAroundPlayer)
+        if (rotaterAroundPlayer)
         {
             UpdateCameraPositionRotater();
         }
         else
         {
-            UpdateCameraPosition();    
+            UpdateCameraPosition();
         }
     }
     void updateCameraRotation()//카메라 회전
@@ -265,7 +274,7 @@ public class StudyPlayerManager : MonoBehaviour
 
         yaw += mouseX;
         pitch -= mouseY;
-        
+
         pitch = Mathf.Clamp(pitch, -45f, 45f);
 
         mainCamera.transform.rotation = Quaternion.Euler(pitch, yaw, 0);
@@ -285,9 +294,9 @@ public class StudyPlayerManager : MonoBehaviour
         UpdateAimTarget();
     }
     void UpdateCameraPositionRotater()// 카메라가 플레이어 주위를 회전 
-    {   
-        Vector3 direction = new Vector3(0,0, -currentDistance); //카메라 거리 설정
-        Quaternion rotation = Quaternion.Euler(pitch,yaw, 0);
+    {
+        Vector3 direction = new Vector3(0, 0, -currentDistance); //카메라 거리 설정
+        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
 
         //카메라를 플레이어의 오른쪽에서 고정된 위치로 이동
         cameraTransform.position = transform.position + thirdPersonOffset + rotation * direction;
@@ -302,7 +311,7 @@ public class StudyPlayerManager : MonoBehaviour
         // "JumpUp" 애니메이션이 완료되었는지 확인 (normalizedTime >= 1)
         bool jumpUpCompleted = animator.GetCurrentAnimatorStateInfo(0).IsName("JumpingUp")
             && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f;
-        if(isGround && isJumping && jumpUpCompleted)
+        if (isGround && isJumping && jumpUpCompleted)
         {
             animator.SetTrigger("JumpDown");
             isJumping = false;
@@ -362,12 +371,12 @@ public class StudyPlayerManager : MonoBehaviour
         bool leftHit = CheckGround(leftFoot);
         bool rightHit = CheckGround(rightFoot);
 
-        if(leftHit && !isLeftFootGround)
+        if (leftHit && !isLeftFootGround)
         {
             if (StudySoundManager.Instance.SFXAudioSourse.isPlaying) return;
             StudySoundManager.Instance.PlaySFX("DefaltFootStep", leftFoot.position);
         }
-        if(rightHit && !isRightFootGround)
+        if (rightHit && !isRightFootGround)
         {
             if (StudySoundManager.Instance.SFXAudioSourse.isPlaying) return;
             StudySoundManager.Instance.PlaySFX("DefaltFootStep", rightFoot.position);
@@ -382,7 +391,7 @@ public class StudyPlayerManager : MonoBehaviour
 
         bool hit = Physics.Raycast(rayStart, Vector3.down, 0.1f);
 
-        Debug.DrawRay(rayStart,Vector3.down*0.1f,hit ? Color.green : Color.red);
+        Debug.DrawRay(rayStart, Vector3.down * 0.1f, hit ? Color.green : Color.red);
 
         return hit;
     }
@@ -391,12 +400,12 @@ public class StudyPlayerManager : MonoBehaviour
         if (Input.GetMouseButtonDown(1) && !isZoomed) //오른쪽 마우스 버튼을 눌렀을 때
         {
             isZoomed = true;
-            
+
             noneCrossHair.SetActive(false);
             crossHair.SetActive(true);
 
             AimWeapon();
-            
+
             if (zoomCoroutine != null)
             {
                 StopCoroutine(zoomCoroutine);
@@ -449,47 +458,27 @@ public class StudyPlayerManager : MonoBehaviour
     }
     IEnumerator ZoomCamera(float targetDistance)
     {
-        while(Mathf.Abs(currentDistance-targetDistance) > 0.01f)
+        while (Mathf.Abs(currentDistance - targetDistance) > 0.01f)
         {
-            currentDistance = Mathf.Lerp(currentDistance,targetDistance, Time.deltaTime * zoomSpeed);
+            currentDistance = Mathf.Lerp(currentDistance, targetDistance, Time.deltaTime * zoomSpeed);
             yield return null;
         }
         currentDistance = targetDistance; //목표거리에 도달한후 값을 고정
     }
     IEnumerator ZoomFieldOfView(float targetDistance)
     {
-        while(Mathf.Abs(mainCamera.fieldOfView - targetFov) > 0.01f)
+        while (Mathf.Abs(mainCamera.fieldOfView - targetFov) > 0.01f)
         {
-            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView,targetFov, Time.deltaTime * zoomSpeed);
+            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, targetFov, Time.deltaTime * zoomSpeed);
             yield return null;
         }
         mainCamera.fieldOfView = targetFov;
     }
     void FireWeapon() //총에 따라 달라지게하는 기능
     {
-        if (Input.GetMouseButtonDown(0) && isZoomed && !isFire)
+        if (Input.GetMouseButtonDown(0) && isZoomed && isFire)
         {
-            
-            if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Pistol)
-            {
-                FirePistol();
-            }
-            else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.ShotGun)
-            {
-                FireShotGun();
-            }
-            else if(StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Rifle)
-            {
-                FireRifle();
-            }
-            else if(StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.SMG)
-            {
-                FireSMG();
-            }
-            isFire = true;
-            //animator.SetTrigger("Fire");
-            StartCoroutine(ShotDelay(delayShot));
-            ApplyRecoil();
+            StartCoroutine(ShotDelay());
         }
     }
     void ApplyRecoil() //반동 기능
@@ -513,33 +502,33 @@ public class StudyPlayerManager : MonoBehaviour
     void FirePistol()
     {
         animator.SetTrigger("FirePistol");
-        StudySoundManager.Instance.PlaySFX("FirePistol",transform.position);
-        GameObject effectPos = GameObject.Find("EffectPos");
-        ParticleManager.instance.PlayParticle(ParticleManager.ParticleType.PistolEffect,effectPos.transform.position);
+        StudySoundManager.Instance.PlaySFX("FirePistol", transform.position);
+        Weapon currentWeapon = StudyWeaponManager.Instance.GetCurrentWeaponComponent();
+        ParticleManager.instance.PlayParticle(ParticleManager.ParticleType.PistolEffect, currentWeapon.effectPos.position);
 
         RaycastHit hit;
         Vector3 orizin = Camera.main.transform.position;
-        
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        
+
         //Vector2 direction = Camera.main.transform.forward;
 
         maxShotDistance = 100f;
         Debug.DrawRay(orizin, ray.direction * maxShotDistance, Color.red, 1.0f);
 
-        if(Physics.Raycast(orizin,ray.direction * maxShotDistance,out hit))
+        if (Physics.Raycast(orizin, ray.direction * maxShotDistance, out hit))
         {
-            if(hit.collider.tag != "Zombie")
+            if (hit.collider.tag != "Zombie")
             {
                 ParticleManager.instance.PlayParticle(ParticleManager.ParticleType.RockImpactEffect, hit.point);
                 Debug.Log("Hit : " + hit.collider.name);
-            }          
+            }
         }
     }
     void FireShotGun()
     {
         animator.Play("FireShotGun");
-        StudySoundManager.Instance.PlaySFX("FireShotGun",transform.position);
+        StudySoundManager.Instance.PlaySFX("FireShotGun", transform.position);
 
         maxShotDistance = 250f;
 
@@ -600,7 +589,7 @@ public class StudyPlayerManager : MonoBehaviour
     void AimWeapon() //웨폰에 따라 에임이 달라지는 기능
     {
         animator.SetLayerWeight(1, 1);
-        
+
         if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Pistol)
         {
             AimPistol();
@@ -634,13 +623,36 @@ public class StudyPlayerManager : MonoBehaviour
     {
         animator.Play("SMGAim");
     }
-    IEnumerator ShotDelay(float delay) //총 쏘고난 후 딜레이
+    IEnumerator ShotDelay() //총 쏘고난 후 딜레이
     {
-        Debug.Log(delay);
-        yield return new WaitForSeconds(delay);
-
         isFire = false;
-        
+        if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Pistol)
+        {
+            fireDelay = 0.5f;
+            FirePistol();
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.ShotGun)
+        {
+            fireDelay = 1.0f;
+            FireShotGun();
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Rifle)
+        {
+            fireDelay = 1.2f;
+            FireRifle();
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.SMG)
+        {
+            fireDelay = 0.1f;
+            FireSMG();
+        }
+
+        //animator.SetTrigger("Fire");
+        ApplyRecoil();
+        yield return new WaitForSeconds(fireDelay);
+
+        isFire = true;
+
     }
     void ChangeWeapon() //1,2,3,4로 무기 변경
     {
@@ -651,20 +663,20 @@ public class StudyPlayerManager : MonoBehaviour
             Debug.Log("Pistol Change");
             animator.SetInteger("WeaponType", 1);
         }
-        else if(Input.GetKeyDown(KeyCode.Alpha2))
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             StudyWeaponManager.Instance.EquipWeapon(Weapon.WeaponType.ShotGun);
             //currentWeaponMode = WeaponMode.ShotGun;
             Debug.Log("ShotGun Change");
             animator.SetInteger("WeaponType", 2);
         }
-        else if(Input.GetKeyDown(KeyCode.Alpha3))
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             StudyWeaponManager.Instance.EquipWeapon(Weapon.WeaponType.Rifle);
             //currentWeaponMode= WeaponMode.Rifle;
             Debug.Log("Rifle Change");
         }
-        else if(Input.GetKeyDown(KeyCode.Alpha4))
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             StudyWeaponManager.Instance.EquipWeapon(Weapon.WeaponType.SMG);
             //currentWeaponMode = WeaponMode.SMG;
@@ -679,23 +691,34 @@ public class StudyPlayerManager : MonoBehaviour
     }
     void RestartGame() //리스타트
     {
-        transform.position = new Vector3(startPosition.x,startPosition.y,startPosition.z);
+        transform.position = new Vector3(startPosition.x, startPosition.y, startPosition.z);
         Debug.Log(startPosition);
         isGameOver = false;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     public void TakeDamage(float damage) //데미지를 입는 기능
     {
-        hp -= damage;
-        hp = Mathf.Max(hp, 0);
-        if(hp <= 0)
+        if(!isDamage)
         {
-            GameOver();
+            StartCoroutine(DamageTime());
+            hp -= damage;
+            hp = Mathf.Max(hp, 0);
+            if (hp <= 0)
+            {
+                GameOver();
+            }
         }
+        
+    }
+    IEnumerator DamageTime()
+    {
+        isDamage = true;
+        yield return new WaitForSeconds(damageDelay);
+        isDamage = false;
     }
     void ToggleSlowMotion() //슬로우모션 기능
     {
-        if(!isSlowMotion)
+        if (!isSlowMotion)
         {
             Time.timeScale = defaltTimeScale;
             currentSpeed /= 2;
@@ -711,33 +734,33 @@ public class StudyPlayerManager : MonoBehaviour
     void GetItem()
     {
         isGetItemAction = true;
-        
+
         bool isPickUp = animator.GetCurrentAnimatorStateInfo(0).IsName("PickUp")
              && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f; ;
-        
+
         //StartCoroutine(ShotDelay(animator.GetCurrentAnimatorStateInfo(0).length/2, isGetItemAction));
         RaycastHit[] hits;
         Vector3 orizin = itemGetPos.position;
         Vector3 direction = itemGetPos.forward;
         //Vector3 direction = Camera.main.transform.forward;
 
-        hits = Physics.BoxCastAll(orizin,boxSize/2,direction,quaternion.identity,castDistance,itemLayer);
+        hits = Physics.BoxCastAll(orizin, boxSize / 2, direction, quaternion.identity, castDistance, itemLayer);
         if (!isPickUp) //알아서 하기 잘 발동할 장소에 두기
         {
             isGetItemAction = false;
         }
         DebugBoxCast(orizin, direction);
-        foreach (RaycastHit hit in hits) 
+        foreach (RaycastHit hit in hits)
         {
             GameObject item = hit.collider.gameObject;
             Debug.Log(hit.collider.gameObject.name);
 
-            if(item.CompareTag("Weapon"))
+            if (item.CompareTag("Weapon"))
             {
                 StudyWeaponManager.Instance.AddWeapon(item);
                 item.SetActive(false);
             }
-            else if(item.CompareTag("Item"))
+            else if (item.CompareTag("Item"))
             {
                 Debug.Log($"아이템 감지 : {item.name}");
                 item.SetActive(true);
@@ -754,14 +777,14 @@ public class StudyPlayerManager : MonoBehaviour
         Vector3 enPoint = orizin + direction * maxShotDistance;
         //BoxCast의 모양을 그리기 위한 8개의 모서리 좌표 계산
         Vector3[] corners = new Vector3[8];
-        corners[0] = orizin + new Vector3(-boxSize.x,-boxSize.y,-boxSize.z) /2;
-        corners[1] = orizin + new Vector3(boxSize.x,-boxSize.y,-boxSize.z) /2;
-        corners[2] = orizin + new Vector3(-boxSize.x,boxSize.y,-boxSize.z) /2;
-        corners[3] = orizin + new Vector3(boxSize.x,boxSize.y,-boxSize.z) /2;
-        corners[4] = orizin + new Vector3(-boxSize.x,-boxSize.y,boxSize.z) /2;
-        corners[5] = orizin + new Vector3(boxSize.x,-boxSize.y,boxSize.z) /2;
-        corners[6] = orizin + new Vector3(-boxSize.x,boxSize.y,boxSize.z) /2;
-        corners[7] = orizin + new Vector3(boxSize.x,boxSize.y,boxSize.z) /2;
+        corners[0] = orizin + new Vector3(-boxSize.x, -boxSize.y, -boxSize.z) / 2;
+        corners[1] = orizin + new Vector3(boxSize.x, -boxSize.y, -boxSize.z) / 2;
+        corners[2] = orizin + new Vector3(-boxSize.x, boxSize.y, -boxSize.z) / 2;
+        corners[3] = orizin + new Vector3(boxSize.x, boxSize.y, -boxSize.z) / 2;
+        corners[4] = orizin + new Vector3(-boxSize.x, -boxSize.y, boxSize.z) / 2;
+        corners[5] = orizin + new Vector3(boxSize.x, -boxSize.y, boxSize.z) / 2;
+        corners[6] = orizin + new Vector3(-boxSize.x, boxSize.y, boxSize.z) / 2;
+        corners[7] = orizin + new Vector3(boxSize.x, boxSize.y, boxSize.z) / 2;
         //시작점 박스의 12개 모서리를 그리기
         Debug.DrawLine(corners[0], corners[1], Color.green, debugDuration);
         Debug.DrawLine(corners[1], corners[3], Color.green, debugDuration);
@@ -787,5 +810,11 @@ public class StudyPlayerManager : MonoBehaviour
         }
         yield return new WaitForSeconds(1.0f);
         effectPos.SetActive(false);
+    }
+    void ToggleFlashLight()
+    {
+        StudySoundManager.Instance.PlaySFX("FlashLight",transform.position);
+        isFlashLight = !isFlashLight;
+        flashLight.enabled = isFlashLight;
     }
 }
