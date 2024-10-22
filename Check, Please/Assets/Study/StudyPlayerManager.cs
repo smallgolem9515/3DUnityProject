@@ -701,6 +701,7 @@ public class StudyPlayerManager : MonoBehaviour
         if(!isDamage)
         {
             StartCoroutine(DamageTime());
+            Debug.Log(hp);
             hp -= damage;
             hp = Mathf.Max(hp, 0);
             if (hp <= 0)
@@ -708,7 +709,6 @@ public class StudyPlayerManager : MonoBehaviour
                 GameOver();
             }
         }
-        
     }
     IEnumerator DamageTime()
     {
@@ -817,4 +817,5 @@ public class StudyPlayerManager : MonoBehaviour
         isFlashLight = !isFlashLight;
         flashLight.enabled = isFlashLight;
     }
+    
 }

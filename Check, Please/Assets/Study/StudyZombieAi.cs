@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -35,19 +36,24 @@ public class StudyZombieAi : MonoBehaviour
     private float idleTimer = 0; //Idle 애니메이션 대기 시간
     private float attackCooldown = 0f; //공격 대기 시간
 
+    private bool isJumping = false; //점프 체크
+    private Rigidbody rb;
+    public float jumpHeight = 2.0f; //점프 높이
+    public float jumpDuration = 1.0f; //점프 체공 시간
+    private NavMeshLink[] navMeshLinks;
+
     void Start()
     {
         animator = GetComponent<Animator>();
         agent = GetComponent<NavMeshAgent>();
-        player = StudyPlayerManager.Instance.transform;
-
-        if(zombieType == ZombieType.ZombieType1)
+        
+        if(zombieType == ZombieType.ZombieType1) //좀비의 종류에 따라 스테이터스 변화
         {
             agent.speed = 1.0f;
             attackCooldown = 1.0f;
             damage = 1;
             hp = 100;
-        } //좀비의 종류에 따라 스테이터스 변화
+        } 
         else if (zombieType == ZombieType.ZombieType2)
         {
             agent.speed = 2.0f;
@@ -63,10 +69,22 @@ public class StudyZombieAi : MonoBehaviour
             hp = 200;
         }
 
+        rb = GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody>();
+        }
+        rb.isKinematic = true;
+        player = StudyPlayerManager.Instance.transform;
+        navMeshLinks = FindObjectsOfType<NavMeshLink>(); //모든 NavMeshLink찾는다.
+
+        animator.SetLayerWeight(1, 0);
         currentState = ZombieState.Partrol;
     }
     void Update()
     {
+        if (isJumping) return; //점프 중에는 다른 동작을 하지 않음
+
         //플레이어와의 거리
         float distanceToPlayer = Vector3.Distance(player.position,transform.position);
 
@@ -149,6 +167,12 @@ public class StudyZombieAi : MonoBehaviour
 
         agent.destination = patrolPoints[currentPatrolIndex].position; //현재 목표 지점으로 이동
         //destination = 목적지를 설정하는 속성, AI가 그 좌표를 목표로 경로를 계산해서 이동
+
+        //장애물이 있거나 NavMeshLink에 가까워지면 점프
+        if(agent.isOnOffMeshLink)
+        {
+            StartCoroutine(JumpAcrossLink());
+        }
 
         //순찰 지점에 도착 했을 때 Idle 상태로 전환, remainingDistance : AI 목표 목적지까지 남은 거리(실시간 업데이트)
         if(agent.remainingDistance < 0.5f && !agent.pathPending) //pathPending : 경로가 계산중인지 여부를 확인
@@ -237,6 +261,40 @@ public class StudyZombieAi : MonoBehaviour
     {
         yield return new WaitForSeconds(attackCooldown);
         isAttacking = false;
+    }
+    IEnumerator JumpAcrossLink()
+    {
+        animator.SetLayerWeight(1, 1);
+        Debug.Log("Zombie Jump");
+
+        isJumping = true;
+        agent.isStopped = true;
+
+        //NavMeshLink 시작과 끝 좌표 가져오기
+        OffMeshLinkData linkData = agent.currentOffMeshLinkData;
+        Vector3 startPos = linkData.startPos;
+        Vector3 endPos = linkData.endPos;
+
+        float elapsedTime = 0;
+        while(elapsedTime < jumpDuration)
+        {
+            float t = elapsedTime / jumpDuration;
+            Vector3 currentPosition = Vector3.Lerp(startPos, endPos, t);
+            currentPosition.y += Mathf.Sin(t * Mathf.PI) * jumpHeight; //포물선 경로
+            transform.position = currentPosition;
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        //도착점에 위치
+        transform.position = endPos;
+
+        //NavMeshAgent 경로 재개
+        agent.CompleteOffMeshLink();
+        agent.isStopped = false;
+
+        isJumping = false;
+        animator.SetLayerWeight(1, 0);
     }
     void DamagedZombie()
     {
