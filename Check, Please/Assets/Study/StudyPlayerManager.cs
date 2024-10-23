@@ -108,7 +108,6 @@ public class StudyPlayerManager : MonoBehaviour
     public LayerMask targetLayer;
 
     [Header("-----WeaponSetting-----")]
-
     public float recoilStrength = 2f; //반동의 세기
     public float maxRecoilAngle = 10.0f; //반동의 최대 각도
     private float currentRecoil = 0f; //현재 반동 값을 저장하는 변수
@@ -132,6 +131,11 @@ public class StudyPlayerManager : MonoBehaviour
     public Light flashLight;
     private bool isFlashLight = false;
 
+    private Rigidbody[] ragdollbodies;
+    private Collider[] ragdollcolliders;
+
+    public GameObject gunImage;
+
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -154,6 +158,9 @@ public class StudyPlayerManager : MonoBehaviour
             originalUpperBodyRotation = upperBody.localRotation;
         }
         flashLight.enabled = false;
+
+        ragdollbodies = GetComponentsInChildren<Rigidbody>();
+        ragdollcolliders = GetComponentsInChildren<Collider>();
     }
     private void Update()
     {
@@ -403,7 +410,7 @@ public class StudyPlayerManager : MonoBehaviour
 
             noneCrossHair.SetActive(false);
             crossHair.SetActive(true);
-
+            gunImage.SetActive(true);
             AimWeapon();
 
             if (zoomCoroutine != null)
@@ -428,6 +435,7 @@ public class StudyPlayerManager : MonoBehaviour
 
             noneCrossHair.SetActive(true);
             crossHair.SetActive(false);
+            gunImage.SetActive(false);
 
             animator.SetLayerWeight(1, 0);
 
@@ -518,10 +526,27 @@ public class StudyPlayerManager : MonoBehaviour
 
         if (Physics.Raycast(orizin, ray.direction * maxShotDistance, out hit))
         {
-            if (hit.collider.tag != "Zombie")
+            if (hit.collider.tag == "Ground")
             {
                 ParticleManager.instance.PlayParticle(ParticleManager.ParticleType.RockImpactEffect, hit.point);
                 Debug.Log("Hit : " + hit.collider.name);
+            }
+            if(hit.collider.tag == "Zombie")
+            {
+                StudyZombieAi zombieAi = hit.collider.GetComponent<StudyZombieAi>();
+
+                if (zombieAi != null)
+                {
+                    StartCoroutine(zombieAi.TakeDamage(5, hit.collider.tag));
+                }
+            }
+            else if(hit.collider.tag == "Head")
+            {
+                StudyZombieAi zombieAi = hit.collider.GetComponentInParent<StudyZombieAi>();
+                if(zombieAi != null)
+                {
+                    StartCoroutine(zombieAi.TakeDamage(5, hit.collider.tag));
+                }
             }
         }
     }
@@ -706,7 +731,8 @@ public class StudyPlayerManager : MonoBehaviour
             hp = Mathf.Max(hp, 0);
             if (hp <= 0)
             {
-                GameOver();
+                isGameOver = true;
+                ActivateRagdoll();
             }
         }
     }
@@ -817,5 +843,20 @@ public class StudyPlayerManager : MonoBehaviour
         isFlashLight = !isFlashLight;
         flashLight.enabled = isFlashLight;
     }
-    
+    public void ActivateRagdoll()
+    {
+        animator.enabled = false;
+        SetRagdollState(true);
+    }
+    private void SetRagdollState(bool state)
+    {
+        foreach(Rigidbody body in ragdollbodies)
+        {
+            body.isKinematic = !state;
+        }
+        foreach(Collider collider in ragdollcolliders)
+        {
+            collider.enabled = state;
+        }
+    }
 }

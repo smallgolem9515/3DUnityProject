@@ -10,6 +10,8 @@ TagManager:
   - Moving
   - Weapon
   - Item
+  - Head
+  - Zombie
   layers:
   - Default
   - TransparentFX

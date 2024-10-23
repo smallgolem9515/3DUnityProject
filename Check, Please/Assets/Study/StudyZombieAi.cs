@@ -8,7 +8,7 @@ public class StudyZombieAi : MonoBehaviour
 {
     public enum ZombieState //좀비의 상태를 관리
     {
-        Partrol, Chase, Attack, Idle, Damage, Die
+        Partrol, Chase, Attack, Idle
     }
     public ZombieState currentState; //현재 상태
 
@@ -22,7 +22,7 @@ public class StudyZombieAi : MonoBehaviour
     private Transform player; //플레이어의 Transform
     public float detectionRange = 10f; //플레이어를 감지하는 범위
     public float attackRange = 2.0f; //공격범위
-    public int hp = 100; //기본체력(단 ZombieType마다 다름)
+    public float hp = 100; //기본체력(단 ZombieType마다 다름)
     public int damage = 1;
     public Transform handTransform; //좀비의 손 위치
     public float sphereCastRadius = 0.5f; //Cast 반경
@@ -41,6 +41,8 @@ public class StudyZombieAi : MonoBehaviour
     public float jumpHeight = 2.0f; //점프 높이
     public float jumpDuration = 1.0f; //점프 체공 시간
     private NavMeshLink[] navMeshLinks;
+    private bool isDamage = false;
+    private bool isDie = false;
 
     void Start()
     {
@@ -83,7 +85,7 @@ public class StudyZombieAi : MonoBehaviour
     }
     void Update()
     {
-        if (isJumping) return; //점프 중에는 다른 동작을 하지 않음
+        if (isJumping || isDie || isDamage) return; //점프 중에는 다른 동작을 하지 않음
 
         //플레이어와의 거리
         float distanceToPlayer = Vector3.Distance(player.position,transform.position);
@@ -188,6 +190,10 @@ public class StudyZombieAi : MonoBehaviour
         agent.destination = player.position; //목표 위치를 플레이어로 지정
         animator.SetBool("isWalking", true);
         animator.SetBool("isIdle", false);
+        if (agent.isOnOffMeshLink)
+        {
+            StartCoroutine(JumpAcrossLink());
+        }
     }
     void AttackPlayer()
     {
@@ -296,8 +302,46 @@ public class StudyZombieAi : MonoBehaviour
         isJumping = false;
         animator.SetLayerWeight(1, 0);
     }
-    void DamagedZombie()
+    public IEnumerator TakeDamage(float amount, string hitPart)
     {
+        Debug.Log(isDamage);
+        isDamage = true;
+        agent.isStopped = true;
+        float damagedTime = 2.0f;
+        if(hitPart == "Head")
+        {
+            Debug.Log("Zombie Head Hit");
+            amount *= 2.0f;
+            animator.SetTrigger("HeadHit");
+            damagedTime = 3.0f;
+        }
+        else if(hitPart == "Body")
+        {
+            Debug.Log("Zombie Body Hit");
+            animator.SetTrigger("BodyHit");
+        }
+        else
+        {
+            Debug.Log("Zombie Hit");
+            animator.SetTrigger("Hit");
+        }
+        hp -= amount;
 
+        if(hp <= 0)
+        {
+            Die();
+        }
+        Debug.Log(hp);
+        yield return new WaitForSeconds(damagedTime);
+        isDamage = false;
+        Debug.Log(isDamage);
+        agent.isStopped = false;
+    }
+    void Die()
+    {
+        isDie = true;
+        animator.SetTrigger("Die");
+        isAttacking = false;
+        agent.isStopped = true;
     }
 }
