@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameSettingManager : MonoBehaviour
 {
@@ -97,5 +98,13 @@ public class GameSettingManager : MonoBehaviour
     public void OnOptionSetting()
     {
         option.SetActive(true);
+    }
+    public void OnGameStart()
+    {
+        SceneManager.LoadScene("Level2");
+    }
+    public void OnExitGame()
+    {
+        
     }
 }

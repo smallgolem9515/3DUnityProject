@@ -221,7 +221,7 @@ public class StudyZombieAi : MonoBehaviour
         attackDirection.Normalize();
 
         RaycastHit hit;
-        float shpereRadius = 1.0f; //반경
+        float shpereRadius = 0.1f; //반경
         float castDistance = attackRange;
 
         if (Physics.SphereCast(handTransform.position, shpereRadius, attackDirection, out hit, castDistance, attackLayerMask))
@@ -304,22 +304,27 @@ public class StudyZombieAi : MonoBehaviour
     }
     public IEnumerator TakeDamage(float amount, string hitPart)
     {
+        if(isDamage)
+        {
+            StopCoroutine(TakeDamage(amount, hitPart));
+        }
         Debug.Log(isDamage);
         isDamage = true;
         agent.isStopped = true;
-        float damagedTime = 2.0f;
+        float damagedTime = 0.5f;
+        ParticleManager.instance.PlayParticle(ParticleManager.ParticleType.BloodEffect, transform.position);
         if(hitPart == "Head")
         {
             Debug.Log("Zombie Head Hit");
             amount *= 2.0f;
             animator.SetTrigger("HeadHit");
-            damagedTime = 3.0f;
+            damagedTime = 2.0f;
         }
-        else if(hitPart == "Body")
-        {
-            Debug.Log("Zombie Body Hit");
-            animator.SetTrigger("BodyHit");
-        }
+        //else if(hitPart == "Body")
+        //{
+        //    Debug.Log("Zombie Body Hit");
+        //    animator.SetTrigger("BodyHit");
+        //}
         else
         {
             Debug.Log("Zombie Hit");
@@ -331,11 +336,15 @@ public class StudyZombieAi : MonoBehaviour
         {
             Die();
         }
-        Debug.Log(hp);
-        yield return new WaitForSeconds(damagedTime);
-        isDamage = false;
-        Debug.Log(isDamage);
-        agent.isStopped = false;
+        else
+        {
+            Debug.Log(hp);
+            yield return new WaitForSeconds(damagedTime);
+            isDamage = false;
+            Debug.Log(isDamage);
+            agent.isStopped = false;
+        }
+        
     }
     void Die()
     {

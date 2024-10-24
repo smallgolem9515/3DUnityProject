@@ -136,6 +136,8 @@ public class StudyPlayerManager : MonoBehaviour
 
     public GameObject gunImage;
 
+    private bool lastOpenedForward = true; //마지막으로 문이 정방향ㅇ로 열렸는지 여부
+
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
@@ -182,7 +184,7 @@ public class StudyPlayerManager : MonoBehaviour
             previousPosition = transform.position;
 
 
-            updateCameraRotation();
+            UpdateCameraRotation();
             if (isFirstPerson)
             {
                 FirstPersonMovement(); //1인칭
@@ -257,9 +259,11 @@ public class StudyPlayerManager : MonoBehaviour
     }
     void FirstPersonMovement() //1인칭
     {
-        Vector3 move = transform.right * horizontal + transform.forward * vertical;
+        Vector3 move = transform.right * horizontal + transform.forward * vertical + transform.up * velocity.y;
         characterController.Move(move * currentSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.Euler(0, yaw, 0);
         mainCamera.transform.position = playerHead.position;
+        
     }
     void ThirdPersonMovement() //3인칭
     {
@@ -274,7 +278,7 @@ public class StudyPlayerManager : MonoBehaviour
             UpdateCameraPosition();
         }
     }
-    void updateCameraRotation()//카메라 회전
+    void UpdateCameraRotation()//카메라 회전
     {
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime; //마우스값을 가져오고 민감도와 시간을 곱한다.
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
@@ -725,10 +729,10 @@ public class StudyPlayerManager : MonoBehaviour
     {
         if(!isDamage)
         {
-            StartCoroutine(DamageTime());
             Debug.Log(hp);
             hp -= damage;
             hp = Mathf.Max(hp, 0);
+            StartCoroutine(DamageTime());
             if (hp <= 0)
             {
                 isGameOver = true;
@@ -779,6 +783,32 @@ public class StudyPlayerManager : MonoBehaviour
         foreach (RaycastHit hit in hits)
         {
             GameObject item = hit.collider.gameObject;
+
+            DoorBase door = item.GetComponent<DoorBase>();
+
+            if(door != null)
+            {
+                if(door.isOpen)
+                {
+                    StudySoundManager.Instance.PlaySFX("DoorClose",hit.transform.position);
+                    if(!lastOpenedForward)
+                    {
+                        door.CloseForward(transform);
+                    }
+                    else
+                    {
+                        door.CloseBackward(transform);
+                    }
+                }
+                else
+                {
+                    if(door.Open(transform))
+                    {
+                        lastOpenedForward = door.lastOpenForward;
+                    }
+                }
+                return;
+            }
             Debug.Log(hit.collider.gameObject.name);
 
             if (item.CompareTag("Weapon"))
@@ -824,8 +854,6 @@ public class StudyPlayerManager : MonoBehaviour
         Debug.DrawLine(corners[1], corners[5], Color.green, debugDuration);
         Debug.DrawLine(corners[2], corners[6], Color.green, debugDuration);
         Debug.DrawLine(corners[3], corners[7], Color.green, debugDuration);
-
-        Debug.DrawRay(orizin, direction * maxShotDistance, Color.green, debugDuration);
     }
     public IEnumerator EffectActive()
     {
