@@ -24,6 +24,8 @@ public class StudyWeaponManager : MonoBehaviour
     private Weapon.WeaponType currentWeaponType = Weapon.WeaponType.None; //현재 무기 타입
     private Weapon currentWeaponComponent; //현재 무기의 Weapon 컴포넌트(EffectPos를 가져오기 위해 사용)
 
+    public Transform weaponPos;
+
 
     private void Awake()
     {
@@ -49,8 +51,13 @@ public class StudyWeaponManager : MonoBehaviour
         if(!weaponInventory.ContainsKey(weaponType)) //예외처리
         {
             Debug.Log("무기가 인벤토리에 없습니다.");
+            return;
         }
-
+        foreach(Transform child in weaponPos)
+        {
+            child.gameObject.SetActive(false);
+        }
+        weaponSpawnPoints[weaponType].gameObject.SetActive(true);
         foreach(Transform child in weaponSpawnPoints[weaponType])
         {
             Destroy(child.gameObject);

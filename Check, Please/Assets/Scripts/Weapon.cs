@@ -37,14 +37,23 @@ public class Weapon : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        UIImage.gameObject.SetActive(true);
+        if(other.gameObject.tag == "Player")
+        {
+            UIImage.gameObject.SetActive(true);
+        }
     }
     private void OnTriggerStay(Collider other)
     {
-        UIImage.gameObject.SetActive(true);
+        if (other.gameObject.tag == "Player")
+        {
+            UIImage.gameObject.SetActive(true);
+        }
     }
     private void OnTriggerExit(Collider other)
     {
-        UIImage.gameObject.SetActive(false);
+        if (other.gameObject.tag == "Player")
+        {
+            UIImage.gameObject.SetActive(false);
+        }
     }
 }

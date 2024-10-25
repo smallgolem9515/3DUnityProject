@@ -4,6 +4,19 @@ using UnityEngine;
 
 public class CrossHair : MonoBehaviour
 {
+    static public CrossHair instance;
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
     private RectTransform crossHair;
 
     private float crossHairSize = 10; //CrossHairSize
@@ -18,15 +31,28 @@ public class CrossHair : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) //총을 쏘면에 대한 조건
-        {
-            crossHairSize = Mathf.Lerp(crossHairSize, crossHairMaxSize, Time.deltaTime * crossHairSpeed);
-        }
-        else
-        {
-            crossHairSize = Mathf.Lerp(crossHairSize, crossDefaltSize, Time.deltaTime * 2);
-        }
+        crossHairSize = Mathf.Lerp(crossHairSize, crossDefaltSize, Time.deltaTime * 2);
 
         crossHair.sizeDelta = new Vector2(crossHairSize, crossHairSize); //크기 적용
+    }
+    public void WeaponCrossSpeed()
+    {
+        if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Pistol)
+        {
+            crossHairMaxSize = 100;
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.ShotGun)
+        {
+            crossHairMaxSize = 200;
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Rifle)
+        {
+            crossHairMaxSize = 150;
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.SMG)
+        {
+            crossHairMaxSize = 50;
+        }
+        crossHairSize = Mathf.Lerp(crossHairSize, crossHairMaxSize, Time.deltaTime * crossHairSpeed);
     }
 }

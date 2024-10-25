@@ -210,6 +210,7 @@ public class StudyZombieAi : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
         //Quaternion.Slerp() : 두개의 쿼터니언을 부드럽게 보간하는 함수
 
+
         PerformAttack();
         Debug.Log("Zombie Attack 상태");
 
@@ -308,7 +309,6 @@ public class StudyZombieAi : MonoBehaviour
         {
             StopCoroutine(TakeDamage(amount, hitPart));
         }
-        Debug.Log(isDamage);
         isDamage = true;
         agent.isStopped = true;
         float damagedTime = 0.5f;
@@ -328,7 +328,6 @@ public class StudyZombieAi : MonoBehaviour
         else
         {
             Debug.Log("Zombie Hit");
-            animator.SetTrigger("Hit");
         }
         hp -= amount;
 
@@ -340,14 +339,17 @@ public class StudyZombieAi : MonoBehaviour
         {
             Debug.Log(hp);
             yield return new WaitForSeconds(damagedTime);
-            isDamage = false;
-            Debug.Log(isDamage);
-            agent.isStopped = false;
-        }
-        
+            if(!isDie)
+            {
+                isDamage = false;
+                Debug.Log(isDamage);
+                agent.isStopped = false;
+            }
+        }    
     }
     void Die()
     {
+
         isDie = true;
         animator.SetTrigger("Die");
         isAttacking = false;
