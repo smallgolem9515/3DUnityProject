@@ -107,4 +107,12 @@ public class GameSettingManager : MonoBehaviour
     {
         
     }
+    public void OnMainMenu()
+    {
+
+    }
+    public void OnPesue()
+    {
+
+    }
 }

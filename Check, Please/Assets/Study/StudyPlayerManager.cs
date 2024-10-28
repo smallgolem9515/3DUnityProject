@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -134,8 +135,6 @@ public class StudyPlayerManager : MonoBehaviour
     private Rigidbody[] ragdollbodies;
     private Collider[] ragdollcolliders;
 
-    public GameObject gunImage;
-
     private bool lastOpenedForward = true; //마지막으로 문이 정방향으로 열렸는지 여부
     public float shakeDuration = 0.2f;
     public float shakeMagnitude = 0.1f;
@@ -143,12 +142,24 @@ public class StudyPlayerManager : MonoBehaviour
     private bool isShake = false;
     public Image bloodImage;
 
+    [Header("-----Weapon Bullet-----")]
+    public bool isReloading = false;
     public int pistolBulletCount = 120;
-    public int pistolCurrentBulletCount = 20;
-    public int shouGunBulletCount = 60;
-    public int shotGunCurrentBulletCount = 10;
+    public int pistolCurrentBulletCount = 12;
+    public int pistolMaxBulletCount = 12;
+    public int shotGunBulletCount = 60;
+    public int shotGunCurrentBulletCount = 4;
+    public int shotGunMaxBulletCount = 4;
     public int rifleBulletCount = 90;
-    public int rifleCurrentBulletCount = 15;
+    public int rifleCurrentBulletCount = 8;
+    public int rifleMaxBulletCount = 8;
+
+    public GameObject gunBackGround;
+    public GameObject gunImage;
+    public Text bulletCountText;
+    public Sprite[] gunSprites;
+    public GameObject escMenu;
+    bool isESCMenu = false;
 
     private void Start()
     {
@@ -196,9 +207,23 @@ public class StudyPlayerManager : MonoBehaviour
             //현재 위치를 이전 위치로 저장(다음 프레임에서 비교하기위함)
             previousPosition = transform.position;
 
-            
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                if (escMenu.activeSelf)
+                {
+                    isESCMenu = false;
+                    escMenu.SetActive(false);
+                    Time.timeScale = 1.0f;
+                }
+                else
+                {
+                    isESCMenu = true;
+                    escMenu.SetActive(true);
+                    Time.timeScale = 0;
+                }
+            }
             UpdateCameraRotation();
-            if(!isGetItemAction)
+            if(!isESCMenu)
             {
                 if (isFirstPerson)
                 {
@@ -210,6 +235,8 @@ public class StudyPlayerManager : MonoBehaviour
                 }
                 RunAction();
                 Jump(); //점프
+
+                BulletCountText();
 
                 FireWeapon();
                 ChangeWeapon();
@@ -245,10 +272,10 @@ public class StudyPlayerManager : MonoBehaviour
                 }
                 if (Input.GetKeyDown(KeyCode.R))
                 {
-                    WeaponReload();
+                    StartCoroutine(WeaponReload());
                 }
+                
             }
-            
         }
     }
     private void LateUpdate()
@@ -320,7 +347,7 @@ public class StudyPlayerManager : MonoBehaviour
         //카메라의 위치가 자기 자신에서 살짝위 + 방향을 바꿔가며 + 살짝 뒤에서
 
         //카메라가 플레이어의 위치를 따라가도록 설정
-        cameraTransform.LookAt(playerLookObj.position + new Vector3(0, thirdPersonOffset.y, 0));
+        cameraTransform.LookAt(playerLookObj.position + new Vector3(0, thirdPersonOffset.y + currentRecoil, 0));
 
         UpdateAimTarget();
     }
@@ -434,7 +461,10 @@ public class StudyPlayerManager : MonoBehaviour
 
             noneCrossHair.SetActive(false);
             crossHair.SetActive(true);
-            gunImage.SetActive(true);
+            if(StudyWeaponManager.Instance.GetCurrentWeaponType() != Weapon.WeaponType.None)
+            {
+                gunBackGround.SetActive(true);
+            }
             AimWeapon();
 
             if (zoomCoroutine != null)
@@ -459,7 +489,7 @@ public class StudyPlayerManager : MonoBehaviour
 
             noneCrossHair.SetActive(true);
             crossHair.SetActive(false);
-            gunImage.SetActive(false);
+            gunBackGround.SetActive(false);
 
             animator.SetLayerWeight(1, 0);
 
@@ -508,7 +538,7 @@ public class StudyPlayerManager : MonoBehaviour
     }
     void FireWeapon() //총에 따라 달라지게하는 기능
     {
-        if (Input.GetMouseButtonDown(0) && isZoomed && isFire)
+        if (Input.GetMouseButtonDown(0) && isZoomed && isFire && !isReloading)
         {
             StartCoroutine(ShotDelay());
         }
@@ -528,24 +558,31 @@ public class StudyPlayerManager : MonoBehaviour
         Quaternion recoilRotation = quaternion.Euler(-currentRecoil, 0, 0);
 
         //현재 회전 값에 반동을 곱하여 새로운 회전값을 적용
-        Camera.main.transform.rotation = currentRotation * recoilRotation;
+        //Camera.main.transform.rotation = currentRotation * recoilRotation;
+        Debug.Log(currentRecoil);
     }
     IEnumerator ShotDelay() //총 쏘고난 후 딜레이
     {
         
         if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Pistol)
         {
-            fireDelay = 0.5f;
+            if (pistolCurrentBulletCount <= 0) yield break;
+            fireDelay = 0.8f;
+            recoilStrength = 0.05f;
             FirePistol();
         }
         else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.ShotGun)
         {
+            if (shotGunCurrentBulletCount <= 0) yield break;
             fireDelay = 1.0f;
+            recoilStrength = 0.1f;
             FireShotGun();
         }
         else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Rifle)
         {
+            if(rifleCurrentBulletCount <= 0) yield break;
             fireDelay = 1.2f;
+            recoilStrength = 0.08f;
             FireRifle();
         }
         else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.SMG)
@@ -566,6 +603,14 @@ public class StudyPlayerManager : MonoBehaviour
         StudySoundManager.Instance.PlaySFX("FirePistol", transform.position);
         Weapon currentWeapon = StudyWeaponManager.Instance.GetCurrentWeaponComponent();
         ParticleManager.instance.PlayParticle(ParticleManager.ParticleType.PistolEffect, currentWeapon.effectPos.position);
+        Debug.Log(currentWeapon.effectPos.position);
+        
+
+        pistolCurrentBulletCount--;
+        if(pistolCurrentBulletCount <= 0)
+        {
+            pistolCurrentBulletCount = 0;
+        }
 
         RaycastHit hit;
         Vector3 orizin = Camera.main.transform.position;
@@ -612,6 +657,12 @@ public class StudyPlayerManager : MonoBehaviour
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
+        shotGunCurrentBulletCount--;
+        if(shotGunCurrentBulletCount <= 0)
+        {
+            shotGunCurrentBulletCount = 0;
+        }
+
         maxShotDistance = 250f;
 
         for (int i = 0; i < shotGunRayCount; i++)
@@ -639,7 +690,7 @@ public class StudyPlayerManager : MonoBehaviour
 
                     if (zombieAi != null)
                     {
-                        StartCoroutine(zombieAi.TakeDamage(5, hit.collider.tag));
+                        StartCoroutine(zombieAi.TakeDamage(20, hit.collider.tag));
                     }
                 }
                 else if (hit.collider.tag == "Head")
@@ -647,7 +698,7 @@ public class StudyPlayerManager : MonoBehaviour
                     StudyZombieAi zombieAi = hit.collider.GetComponentInParent<StudyZombieAi>();
                     if (zombieAi != null)
                     {
-                        StartCoroutine(zombieAi.TakeDamage(5, hit.collider.tag));
+                        StartCoroutine(zombieAi.TakeDamage(20, hit.collider.tag));
                     }
                 }
             }
@@ -660,6 +711,12 @@ public class StudyPlayerManager : MonoBehaviour
 
         Weapon currentWeapon = StudyWeaponManager.Instance.GetCurrentWeaponComponent();
         ParticleManager.instance.PlayParticle(ParticleManager.ParticleType.RifleEffect, currentWeapon.effectPos.position);
+
+        rifleCurrentBulletCount--;
+        if(rifleCurrentBulletCount <= 0)
+        {
+            rifleCurrentBulletCount = 0;
+        }
 
         RaycastHit hit;
         Vector3 orizin = Camera.main.transform.position;
@@ -682,7 +739,7 @@ public class StudyPlayerManager : MonoBehaviour
 
                 if (zombieAi != null)
                 {
-                    StartCoroutine(zombieAi.TakeDamage(5, hit.collider.tag));
+                    StartCoroutine(zombieAi.TakeDamage(15, hit.collider.tag));
                 }
             }
             else if (hit.collider.tag == "Head")
@@ -690,7 +747,7 @@ public class StudyPlayerManager : MonoBehaviour
                 StudyZombieAi zombieAi = hit.collider.GetComponentInParent<StudyZombieAi>();
                 if (zombieAi != null)
                 {
-                    StartCoroutine(zombieAi.TakeDamage(5, hit.collider.tag));
+                    StartCoroutine(zombieAi.TakeDamage(15, hit.collider.tag));
                 }
             }
         }
@@ -758,6 +815,7 @@ public class StudyPlayerManager : MonoBehaviour
             Debug.Log("Pistol Change");
             if(StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Pistol)
             {
+                gunImage.GetComponent<Image>().sprite = gunSprites[0];
                 animator.SetInteger("WeaponType", 1);
             }
         }
@@ -767,6 +825,7 @@ public class StudyPlayerManager : MonoBehaviour
             Debug.Log("ShotGun Change");
             if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.ShotGun)
             {
+                gunImage.GetComponent<Image>().sprite = gunSprites[1];
                 animator.SetInteger("WeaponType", 2);
             }
         }
@@ -776,6 +835,7 @@ public class StudyPlayerManager : MonoBehaviour
             Debug.Log("Rifle Change");
             if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Rifle)
             {
+                gunImage.GetComponent<Image>().sprite = gunSprites[2];
                 animator.SetInteger("WeaponType", 3);
             }
         }
@@ -881,10 +941,22 @@ public class StudyPlayerManager : MonoBehaviour
                 StudyWeaponManager.Instance.AddWeapon(item);
                 item.SetActive(false);
             }
-            else if (item.CompareTag("Item"))
+            else if (item.CompareTag("Ammo"))
             {
                 Debug.Log($"아이템 감지 : {item.name}");
-                item.SetActive(true);
+                if(item.name.Contains("Pistol"))
+                {
+                    pistolBulletCount += 30;
+                }
+                else if(item.name.Contains("ShotGun"))
+                {
+                    shotGunBulletCount += 12;
+                }
+                else if(item.name.Contains("Rifle"))
+                {
+                    rifleBulletCount += 20;
+                }
+                item.SetActive(false);
             }
             else
             {
@@ -964,8 +1036,132 @@ public class StudyPlayerManager : MonoBehaviour
         bloodImage.gameObject.SetActive(false);
         isShake = false;
     }
-    void WeaponReload()
+    IEnumerator WeaponReload()
     {
+        int reloadBullet = 0;
+        if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Pistol &&
+            pistolCurrentBulletCount != pistolMaxBulletCount && pistolBulletCount != 0)
+        {
+            isReloading = true;
+            if (!isZoomed) animator.SetLayerWeight(1, 1);
+            if (animator.GetCurrentAnimatorStateInfo(1).IsName("PistolReload"))
+            {
+                Debug.Log("리로드중");
+                animator.SetTrigger("WeaponReloadDont");
+                isReloading = false;
+                if (!isZoomed) animator.SetLayerWeight(1, 0);
+                yield break;
+            }
+            animator.SetTrigger("WeaponReload");
+            yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(1).length);
+            if(isReloading)
+            {
+                Debug.Log(animator.GetCurrentAnimatorStateInfo(1).length);
+                reloadBullet = (pistolMaxBulletCount - pistolCurrentBulletCount);
+                if(reloadBullet > pistolBulletCount)
+                {
+                    pistolCurrentBulletCount += pistolBulletCount;
+                    pistolBulletCount = 0;
+                }
+                else
+                {
+                    pistolBulletCount -= reloadBullet;
+                    pistolCurrentBulletCount = pistolMaxBulletCount;
+                }
+                isReloading = false;
+                if(!isZoomed) animator.SetLayerWeight(1, 0);
+            }
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.ShotGun &&
+            shotGunCurrentBulletCount != shotGunMaxBulletCount && shotGunBulletCount != 0)
+        {
+            isReloading = true;
+            if (!isZoomed) animator.SetLayerWeight(1, 1);
+            if (animator.GetCurrentAnimatorStateInfo(1).IsName("ShotGunReload"))
+            {
+                Debug.Log("리로드중");
+                animator.SetTrigger("WeaponReloadDont");
+                isReloading = false;
+                if (!isZoomed) animator.SetLayerWeight(1, 0);
+                yield break;
+            }
+            animator.SetTrigger("WeaponReload");
+            yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(1).length);
+            if (isReloading)
+            {
+                Debug.Log(animator.GetCurrentAnimatorStateInfo(1).length);
+                reloadBullet = (shotGunMaxBulletCount - shotGunCurrentBulletCount);
+                if(reloadBullet > shotGunBulletCount)
+                {
+                    shotGunCurrentBulletCount += shotGunBulletCount;
+                    shotGunBulletCount = 0;
+                }
+                else
+                {
+                    shotGunBulletCount -= reloadBullet;
+                    shotGunCurrentBulletCount = shotGunMaxBulletCount;
+                } 
+                isReloading = false;
+                if (!isZoomed) animator.SetLayerWeight(1, 0);
+            }
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Rifle &&
+            rifleCurrentBulletCount != rifleMaxBulletCount && rifleBulletCount != 0)
+        {
+            isReloading = true;
+            if (!isZoomed) animator.SetLayerWeight(1, 1);
+            if (animator.GetCurrentAnimatorStateInfo(1).IsName("RifleReload"))
+            {
+                Debug.Log("리로드중");
+                animator.SetTrigger("WeaponReloadDont");
+                isReloading = false;
+                if (!isZoomed) animator.SetLayerWeight(1, 0);
+                yield break;
+            }
+            animator.SetTrigger("WeaponReload");
+            yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(1).length);
+            if (isReloading)
+            {
+                Debug.Log(animator.GetCurrentAnimatorStateInfo(1).length);
+                reloadBullet = (rifleMaxBulletCount - rifleCurrentBulletCount);
+                if (reloadBullet > rifleBulletCount)
+                {
+                    rifleCurrentBulletCount += rifleBulletCount;
+                    rifleBulletCount = 0;
+                }
+                else
+                {
+                    rifleBulletCount -= reloadBullet;
+                    rifleCurrentBulletCount = rifleMaxBulletCount;
+                }
+                isReloading = false;
+                if (!isZoomed) animator.SetLayerWeight(1, 0);
+            }
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.SMG)
+        {
 
+        }
+        
+
+    }
+    void BulletCountText()
+    {
+        if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Pistol)
+        {
+            bulletCountText.text = pistolCurrentBulletCount + "/" + pistolBulletCount;
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.ShotGun)
+        {
+            bulletCountText.text = shotGunCurrentBulletCount + "/" + shotGunBulletCount;
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Rifle)
+        {
+            bulletCountText.text = rifleCurrentBulletCount + "/" + rifleBulletCount;
+        }
+        else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.SMG)
+        {
+
+        }
     }
 }

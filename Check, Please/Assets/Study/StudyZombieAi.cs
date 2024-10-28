@@ -14,7 +14,7 @@ public class StudyZombieAi : MonoBehaviour
 
     public enum ZombieType //좀비의 종류를 관리
     {
-        ZombieType1,ZombieType2,ZombieType3
+        ZombieType1,ZombieType2,ZombieType3,ZombieType4,ZombieType5,
     }
     public ZombieType zombieType; //좀비 종류
 
@@ -54,19 +54,33 @@ public class StudyZombieAi : MonoBehaviour
             agent.speed = 1.0f;
             attackCooldown = 1.0f;
             damage = 1;
-            hp = 100;
+            hp = 20;
         } 
         else if (zombieType == ZombieType.ZombieType2)
         {
-            agent.speed = 2.0f;
+            agent.speed = 3.0f;
             attackCooldown = 1.5f;
-            damage = 2;
-            hp = 150;
+            damage = 1;
+            hp = 10;
         }
         else if (zombieType == ZombieType.ZombieType3)
         {
-            agent.speed = 1.5f;
+            agent.speed = 2.0f;
             attackCooldown = 2.0f;
+            damage = 2;
+            hp = 50;
+        }
+        else if(zombieType == ZombieType.ZombieType4)
+        {
+            agent.speed = 0.5f;
+            attackCooldown = 3.0f;
+            damage = 3;
+            hp = 100;
+        }
+        else if(zombieType==ZombieType.ZombieType5)
+        {
+            agent.speed = 2.0f;
+            attackCooldown = 1.5f;
             damage = 3;
             hp = 200;
         }
@@ -194,6 +208,7 @@ public class StudyZombieAi : MonoBehaviour
         {
             StartCoroutine(JumpAcrossLink());
         }
+        float distanceToPlayer = Vector3.Distance(player.position, transform.position);
     }
     void AttackPlayer()
     {
@@ -305,6 +320,7 @@ public class StudyZombieAi : MonoBehaviour
     }
     public IEnumerator TakeDamage(float amount, string hitPart)
     {
+        if(isDie) yield break;
         if(isDamage)
         {
             StopCoroutine(TakeDamage(amount, hitPart));

@@ -9,9 +9,9 @@ TagManager:
   - Snow
   - Moving
   - Weapon
-  - Item
   - Head
   - Zombie
+  - Ammo
   layers:
   - Default
   - TransparentFX
