@@ -32,7 +32,7 @@ public class StudyPlayerManager : MonoBehaviour
     }
 
     [Header("-----PlayerMove-----")]
-    float playerSpeedWalk = 2f; //걷는 속도
+    float playerSpeedWalk = 3f; //걷는 속도
     float playerSpeedRun = 5f; //달리기 속도
     public float currentSpeed = 1f; //변경 속도
     public float hp;
@@ -187,6 +187,7 @@ public class StudyPlayerManager : MonoBehaviour
 
         ragdollbodies = GetComponentsInChildren<Rigidbody>();
         ragdollcolliders = GetComponentsInChildren<Collider>();
+        StudySoundManager.Instance.PlayBGM("GameLevel1");
     }
     private void Update()
     {
@@ -608,7 +609,7 @@ public class StudyPlayerManager : MonoBehaviour
         Debug.Log(currentWeapon.effectPos.position);
         
         pistolCurrentBulletCount--;
-        MathF.Max(pistolCurrentBulletCount, 0);
+        pistolCurrentBulletCount = (int)MathF.Max(pistolCurrentBulletCount, 0);
 
         RaycastHit hit;
         Vector3 orizin = Camera.main.transform.position;
@@ -656,7 +657,7 @@ public class StudyPlayerManager : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         shotGunCurrentBulletCount--;
-        MathF.Max(shotGunCurrentBulletCount, 0);
+        shotGunCurrentBulletCount = (int)MathF.Max(shotGunCurrentBulletCount, 0);
 
         maxShotDistance = 250f;
 
@@ -708,7 +709,7 @@ public class StudyPlayerManager : MonoBehaviour
         ParticleManager.instance.PlayParticle(ParticleManager.ParticleType.RifleEffect, currentWeapon.effectPos.position);
 
         rifleCurrentBulletCount--;
-        MathF.Max(rifleCurrentBulletCount, 0);
+        rifleCurrentBulletCount = (int)MathF.Max(rifleCurrentBulletCount, 0);
 
         RaycastHit hit;
         Vector3 orizin = Camera.main.transform.position;
@@ -809,6 +810,8 @@ public class StudyPlayerManager : MonoBehaviour
             {
                 gunImage.GetComponent<Image>().sprite = gunSprites[0];
                 animator.SetInteger("WeaponType", 1);
+                StudySoundManager.Instance.PlaySFX("WeaponGet", transform.position);
+
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -819,6 +822,8 @@ public class StudyPlayerManager : MonoBehaviour
             {
                 gunImage.GetComponent<Image>().sprite = gunSprites[1];
                 animator.SetInteger("WeaponType", 2);
+                StudySoundManager.Instance.PlaySFX("WeaponGet", transform.position);
+
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
@@ -829,6 +834,8 @@ public class StudyPlayerManager : MonoBehaviour
             {
                 gunImage.GetComponent<Image>().sprite = gunSprites[2];
                 animator.SetInteger("WeaponType", 3);
+                StudySoundManager.Instance.PlaySFX("WeaponGet", transform.position);
+
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
@@ -857,6 +864,7 @@ public class StudyPlayerManager : MonoBehaviour
     {
         if(!isDamage && !isGameOver)
         {
+            StudySoundManager.Instance.PlaySFX("PlayerDamage",transform.position);
             hp -= damage;
             hp = Mathf.Max(hp, 0);
             StartCoroutine(DamageTime());
@@ -931,6 +939,7 @@ public class StudyPlayerManager : MonoBehaviour
 
             if (item.CompareTag("Weapon"))
             {
+                StudySoundManager.Instance.PlaySFX("WeaponGet",transform.position);
                 StudyWeaponManager.Instance.AddWeapon(item);
                 item.SetActive(false);
             }
@@ -1061,7 +1070,9 @@ public class StudyPlayerManager : MonoBehaviour
                     pistolCurrentBulletCount = pistolMaxBulletCount;
                 }
                 isReloading = false;
-                if(!isZoomed) animator.SetLayerWeight(1, 0);
+                StudySoundManager.Instance.PlaySFX("WeaponReload", transform.position);
+
+                if (!isZoomed) animator.SetLayerWeight(1, 0);
             }
         }
         else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.ShotGun &&
@@ -1094,6 +1105,8 @@ public class StudyPlayerManager : MonoBehaviour
                     shotGunCurrentBulletCount = shotGunMaxBulletCount;
                 } 
                 isReloading = false;
+                StudySoundManager.Instance.PlaySFX("WeaponReload", transform.position);
+
                 if (!isZoomed) animator.SetLayerWeight(1, 0);
             }
         }
@@ -1127,6 +1140,7 @@ public class StudyPlayerManager : MonoBehaviour
                     rifleCurrentBulletCount = rifleMaxBulletCount;
                 }
                 isReloading = false;
+                StudySoundManager.Instance.PlaySFX("WeaponReload",transform.position);
                 if (!isZoomed) animator.SetLayerWeight(1, 0);
             }
         }
@@ -1158,6 +1172,7 @@ public class StudyPlayerManager : MonoBehaviour
     {
         if(other.CompareTag("Clear"))
         {
+            StudySoundManager.Instance.PlayBGM("Clear");
             Cursor.lockState = CursorLockMode.Confined;
             isClear = true;
             clearImage.SetActive(true);

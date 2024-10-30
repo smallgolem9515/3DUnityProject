@@ -12,7 +12,6 @@ public class ParticleManager : MonoBehaviour
         ShotGunEffect,
         RifleEffect,
         SMGEffect,
-        BloodEffect,
         RockImpactEffect,
         BrickImpactEffect
     }
@@ -25,7 +24,6 @@ public class ParticleManager : MonoBehaviour
     public GameObject shotGunEffect;
     public GameObject rifleEffect;
     public GameObject SMGEffect;
-    public GameObject bloodEffect;
     public GameObject RockImpactEffect;
     public GameObject brickImpactEffect;
 
@@ -47,7 +45,6 @@ public class ParticleManager : MonoBehaviour
         particleDic.Add(ParticleType.ShotGunEffect, shotGunEffect);
         particleDic.Add(ParticleType.RifleEffect, rifleEffect);
         particleDic.Add(ParticleType.SMGEffect, SMGEffect);
-        particleDic.Add(ParticleType.BloodEffect, bloodEffect);
         particleDic.Add(ParticleType.RockImpactEffect, RockImpactEffect);
         particleDic.Add(ParticleType.BrickImpactEffect,brickImpactEffect);
     }

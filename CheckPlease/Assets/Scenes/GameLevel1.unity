@@ -3300,7 +3300,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BGMAudioSourse: {fileID: 340489845}
   SFXAudioSourse: {fileID: 340489844}
-  BGMClipList: []
+  BGMClipList:
+  - name: Menu
+    clip: {fileID: 8300000, guid: 051168dd3f18b614cb273426a6521fb5, type: 3}
+  - name: GameLevel1
+    clip: {fileID: 8300000, guid: d65707d0dde556441b074e7e98afff15, type: 3}
+  - name: Clear
+    clip: {fileID: 8300000, guid: bf4a18bbbc1f9514682bd2a62ad53542, type: 3}
   SFXClipList:
   - name: Jump
     clip: {fileID: 8300000, guid: 7a5ee3b00104c114881e66e072cb3c23, type: 3}
@@ -3320,6 +3326,20 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 1d108c9b495371c44bf224a31f99c3f6, type: 3}
   - name: DoorClose
     clip: {fileID: 8300000, guid: ef2e21bc90e28234795a01a874fd704f, type: 3}
+  - name: FireRifle
+    clip: {fileID: 8300000, guid: 52eee3472cd0d7744a172523797ea3ea, type: 3}
+  - name: WeaponReload
+    clip: {fileID: 8300000, guid: ef937c67580f73e4aadafff56682c500, type: 3}
+  - name: OpenCarGo
+    clip: {fileID: 8300000, guid: 3982791fd42980d4480f5cf67b1b6819, type: 3}
+  - name: PlayerDamage
+    clip: {fileID: 8300000, guid: da951bd07e603c844b3d59f8580ce2ca, type: 3}
+  - name: WeaponGet
+    clip: {fileID: 8300000, guid: a00d29de1df754f43b95117cea12ea06, type: 3}
+  - name: ZombieDamage
+    clip: {fileID: 8300000, guid: 6d79e17c1a9ae7349b3fdbb3ebc112e0, type: 3}
+  - name: ZombieAttack
+    clip: {fileID: 8300000, guid: 759fdd0ee5a2cee458a4974a22abf3ce, type: 3}
 --- !u!4 &340489847
 Transform:
   m_ObjectHideFlags: 0
@@ -3352,7 +3372,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &342773609
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3371,7 +3391,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -134.88354, y: 147.58606}
+  m_AnchoredPosition: {x: -137, y: 194}
   m_SizeDelta: {x: 173.767, y: 185.1721}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &342773610
@@ -20482,6 +20502,10 @@ PrefabInstance:
     - target: {fileID: 811459288003807418, guid: 2018be5242f7e124d8c37cc2eb065b63, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3626595354435019498, guid: 2018be5242f7e124d8c37cc2eb065b63, type: 3}
+      propertyPath: zombieType
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3626595354435019498, guid: 2018be5242f7e124d8c37cc2eb065b63, type: 3}
       propertyPath: currentState

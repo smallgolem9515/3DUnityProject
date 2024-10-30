@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class StudySoundManager : MonoBehaviour
 {
@@ -52,7 +53,13 @@ public class StudySoundManager : MonoBehaviour
         }
         InitializedAudioClips();
     }
-
+    private void Start()
+    {
+        if(SceneManager.GetActiveScene().name == "Menu")
+        {
+            PlayBGM("Menu");
+        }
+    }
     public void PlayBGM(string name)
     {
         if(BGMClips.ContainsKey(name))

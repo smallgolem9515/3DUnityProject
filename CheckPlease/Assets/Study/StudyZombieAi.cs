@@ -247,6 +247,7 @@ public class StudyZombieAi : MonoBehaviour
 
             if(hit.collider.tag == "Player")
             {
+                StudySoundManager.Instance.PlaySFX("ZombieAttack",transform.position);
                 StudyPlayerManager.Instance.TakeDamage(damage);
                 Debug.Log("Player Hit");
             }
@@ -321,7 +322,6 @@ public class StudyZombieAi : MonoBehaviour
     }
     public IEnumerator TakeDamage(float amount, string hitPart)
     {
-        if(isDie) yield break;
         if(isDamage)
         {
             StopCoroutine(TakeDamage(amount, hitPart));
@@ -329,7 +329,6 @@ public class StudyZombieAi : MonoBehaviour
         isDamage = true;
         agent.isStopped = true;
         float damagedTime = 0.5f;
-        ParticleManager.instance.PlayParticle(ParticleManager.ParticleType.BloodEffect, transform.position);
         if(hitPart == "Head")
         {
             Debug.Log("Zombie Head Hit");
@@ -347,8 +346,9 @@ public class StudyZombieAi : MonoBehaviour
             Debug.Log("Zombie Hit");
         }
         hp -= amount;
-
-        if(hp <= 0)
+        hp = (int)Mathf.Max(hp, 0);
+        StudySoundManager.Instance.PlaySFX("ZombieDamage",transform.position);
+        if (hp <= 0)
         {
             Die();
         }

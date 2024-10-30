@@ -23,6 +23,7 @@ public class ZombieWaveManager : MonoBehaviour
                 {
                     break;
                 }
+                StudySoundManager.Instance.PlaySFX("OpenCarGo", objClear1.transform.position);
                 objClear1.SetActive(false);
                 
             }
