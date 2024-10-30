@@ -673,7 +673,7 @@ public class StudyPlayerManager : MonoBehaviour
             Vector3 spreadDirection = Quaternion.Euler(spreadX, spreadY, 0) * ray.direction;
 
             Debug.DrawRay(orizin, spreadDirection * maxShotDistance, Color.red, 1.0f);
-            if (Physics.Raycast(orizin, spreadDirection * maxShotDistance, out hit, targetLayer))
+            if (Physics.Raycast(orizin, spreadDirection * maxShotDistance, out hit))
             {
                 if (hit.collider.tag == "Ground")
                 {
@@ -719,7 +719,7 @@ public class StudyPlayerManager : MonoBehaviour
 
         Debug.DrawRay(orizin, ray.direction * maxShotDistance, Color.red, 1.0f);
 
-        if (Physics.Raycast(orizin, ray.direction * maxShotDistance, out hit, targetLayer))
+        if (Physics.Raycast(orizin, ray.direction * maxShotDistance, out hit))
         {
             if (hit.collider.tag == "Ground")
             {

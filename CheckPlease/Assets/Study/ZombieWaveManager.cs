@@ -17,16 +17,14 @@ public class ZombieWaveManager : MonoBehaviour
     {
         while (true)
         {
-            for (int i = 0; i < zombieWave1.Length; i++)
+            if (zombieWave1[0].activeSelf == false && zombieWave1[1].activeSelf == false &&
+                zombieWave1[2].activeSelf == false && zombieWave1[3].activeSelf == false &&
+                zombieWave1[4].activeSelf == false)
             {
-                if (zombieWave1[i].activeSelf == true)
-                {
-                    break;
-                }
                 StudySoundManager.Instance.PlaySFX("OpenCarGo", objClear1.transform.position);
                 objClear1.SetActive(false);
-                
             }
+            
             yield return new WaitForSeconds(1);
             if(objClear1.activeSelf == false)
             {
