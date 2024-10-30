@@ -247,13 +247,13 @@ public class StudyPlayerManager : MonoBehaviour
                 ZoomMouseRightButton(); //오른쪽 마우스버튼으로 줌
                 if (Input.GetKeyDown(KeyCode.V)) //V키로 1인칭/3인칭 전환
                 {
-                    isFirstPerson = !isFirstPerson;
-                    Debug.Log(isFirstPerson ? "1인칭모드" : "3인칭모드");
+                    //isFirstPerson = !isFirstPerson;
+                    //Debug.Log(isFirstPerson ? "1인칭모드" : "3인칭모드");
                 }
                 if (Input.GetKeyDown(KeyCode.LeftAlt) && !isFirstPerson) //Alt키로 시점 전환
                 {
-                    rotaterAroundPlayer = !rotaterAroundPlayer;
-                    Debug.Log(rotaterAroundPlayer ? "카메라가 플레이어 주위를 회전" : "플레이어가 직접 회전");
+                    //rotaterAroundPlayer = !rotaterAroundPlayer;
+                    //Debug.Log(rotaterAroundPlayer ? "카메라가 플레이어 주위를 회전" : "플레이어가 직접 회전");
                 }
                 if (currentRecoil > 0) //반동으로 초점이 어긋나면 원래 초점으로 돌아오는 기능
                 {
@@ -263,8 +263,8 @@ public class StudyPlayerManager : MonoBehaviour
                 }
                 if (Input.GetKeyDown(KeyCode.Q))
                 {
-                    isSlowMotion = !isSlowMotion;
-                    ToggleSlowMotion();
+                    //isSlowMotion = !isSlowMotion;
+                    //ToggleSlowMotion();
                 }
                 if (Input.GetKeyDown(KeyCode.E))
                 {
