@@ -873,10 +873,9 @@ MonoBehaviour:
   shotGunEffect: {fileID: 136518, guid: 35277ee4b65d54d4199c4e0e48053745, type: 3}
   rifleEffect: {fileID: 153266, guid: 39b2a3d1ecfa5614b97e75a9b5561f21, type: 3}
   SMGEffect: {fileID: 160582, guid: 8ff371e17619a504b9822fc6a2facdb2, type: 3}
-  bloodEffect: {fileID: 100010, guid: d994687938122f94c8aa75e387eb898a, type: 3}
   RockImpactEffect: {fileID: 142740, guid: ce4fb833f44504e48b46c3474bc747fc, type: 3}
   brickImpactEffect: {fileID: 151174, guid: e3c9439885f011549a6460a1f4da82dc, type: 3}
-  poolSize: 20
+  poolSize: 30
 --- !u!4 &42062940
 Transform:
   m_ObjectHideFlags: 0
@@ -3202,7 +3201,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.3
   m_Pitch: 1
   Loop: 0
   Mute: 0
