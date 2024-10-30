@@ -4534,7 +4534,7 @@ MonoBehaviour:
   maxShotDistance: 10
   targetLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 4294967295
   recoilStrength: 0.05
   maxRecoilAngle: 10
   boxSize: {x: 0.5, y: 0.5, z: 0.5}
