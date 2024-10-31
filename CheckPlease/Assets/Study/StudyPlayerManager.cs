@@ -1044,13 +1044,11 @@ public class StudyPlayerManager : MonoBehaviour
             pistolCurrentBulletCount != pistolMaxBulletCount && pistolBulletCount != 0)
         {
             isReloading = true;
-            if (!isZoomed) animator.SetLayerWeight(1, 1);
             if (animator.GetCurrentAnimatorStateInfo(1).IsName("PistolReload"))
             {
                 Debug.Log("리로드중");
                 animator.SetTrigger("WeaponReloadDont");
                 isReloading = false;
-                if (!isZoomed) animator.SetLayerWeight(1, 0);
                 yield break;
             }
             animator.SetTrigger("WeaponReload");
@@ -1071,21 +1069,17 @@ public class StudyPlayerManager : MonoBehaviour
                 }
                 isReloading = false;
                 StudySoundManager.Instance.PlaySFX("WeaponReload", transform.position);
-
-                if (!isZoomed) animator.SetLayerWeight(1, 0);
             }
         }
         else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.ShotGun &&
             shotGunCurrentBulletCount != shotGunMaxBulletCount && shotGunBulletCount != 0)
         {
             isReloading = true;
-            if (!isZoomed) animator.SetLayerWeight(1, 1);
             if (animator.GetCurrentAnimatorStateInfo(1).IsName("ShotGunReload"))
             {
                 Debug.Log("리로드중");
                 animator.SetTrigger("WeaponReloadDont");
                 isReloading = false;
-                if (!isZoomed) animator.SetLayerWeight(1, 0);
                 yield break;
             }
             animator.SetTrigger("WeaponReload");
@@ -1106,21 +1100,17 @@ public class StudyPlayerManager : MonoBehaviour
                 } 
                 isReloading = false;
                 StudySoundManager.Instance.PlaySFX("WeaponReload", transform.position);
-
-                if (!isZoomed) animator.SetLayerWeight(1, 0);
             }
         }
         else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.Rifle &&
             rifleCurrentBulletCount != rifleMaxBulletCount && rifleBulletCount != 0)
         {
             isReloading = true;
-            if (!isZoomed) animator.SetLayerWeight(1, 1);
             if (animator.GetCurrentAnimatorStateInfo(1).IsName("RifleReload"))
             {
                 Debug.Log("리로드중");
                 animator.SetTrigger("WeaponReloadDont");
                 isReloading = false;
-                if (!isZoomed) animator.SetLayerWeight(1, 0);
                 yield break;
             }
             animator.SetTrigger("WeaponReload");
@@ -1141,7 +1131,6 @@ public class StudyPlayerManager : MonoBehaviour
                 }
                 isReloading = false;
                 StudySoundManager.Instance.PlaySFX("WeaponReload",transform.position);
-                if (!isZoomed) animator.SetLayerWeight(1, 0);
             }
         }
         else if (StudyWeaponManager.Instance.GetCurrentWeaponType() == Weapon.WeaponType.SMG)

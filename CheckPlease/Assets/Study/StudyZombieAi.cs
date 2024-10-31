@@ -322,6 +322,7 @@ public class StudyZombieAi : MonoBehaviour
     }
     public IEnumerator TakeDamage(float amount, string hitPart)
     {
+        if (isDie) yield break;
         if(isDamage)
         {
             StopCoroutine(TakeDamage(amount, hitPart));

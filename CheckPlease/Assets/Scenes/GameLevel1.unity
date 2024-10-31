@@ -3371,7 +3371,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &342773609
 RectTransform:
   m_ObjectHideFlags: 0
@@ -20504,7 +20504,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3626595354435019498, guid: 2018be5242f7e124d8c37cc2eb065b63, type: 3}
       propertyPath: zombieType
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3626595354435019498, guid: 2018be5242f7e124d8c37cc2eb065b63, type: 3}
       propertyPath: currentState
