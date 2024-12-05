@@ -1,278 +1,774 @@
 fileFormatVersion: 2
 guid: 6bcbd4ff8e692aa4ba09a0773580a425
-timeCreated: 1515176322
-licenseType: Store
+AssetOrigin:
+  serializedVersion: 1
+  productId: 46731
+  packageName: Black Cat Animated
+  packageVersion: 5.3.8p2
+  assetPath: Assets/Cat/Animations/cat@attack.FBX
+  uploadId: 222678
 ModelImporter:
-  serializedVersion: 19
-  fileIDToRecycleName:
-    100000: Cat
-    100002: //RootNode
-    100004: Cat_Caudal_bone
-    100006: Cat_l_Ankle_bone
-    100008: Cat_l_Ankle_ctrl
-    100010: cat_l_Claw_ctrl
-    100012: Cat_l_Ear1_bone
-    100014: Cat_l_Ear2-nub_bone
-    100016: Cat_l_Ear2_bone
-    100018: Cat_l_Femur_bone
-    100020: Cat_l_Humerus_bone
-    100022: Cat_l_LipB_bone
-    100024: Cat_l_LipF_bone
-    100026: Cat_l_LipM_bone
-    100028: Cat_l_Metacarpals_bone
-    100030: Cat_l_Metatarsals_bone
-    100032: Cat_l_Pelvis_bone
-    100034: Cat_l_Phalanges_bone
-    100036: Cat_l_Phalanges_bone 1
-    100038: Cat_l_Scapula_bone
-    100040: Cat_l_Tibia_bone
-    100042: Cat_l_Ulna_bone
-    100044: Cat_l_Wrist_bone
-    100046: Cat_Mandible2-nub_bone
-    100048: Cat_Mandible2_bone
-    100050: Cat_Mandible_bone
-    100052: Cat_Neck1_bone
-    100054: Cat_Neck2_bone
-    100056: Cat_Neck3_bone
-    100058: Cat_Neck4_bone
-    100060: Cat_Neck5_bone
-    100062: Cat_Neck_bone
-    100064: Cat_r_Ankle_bone
-    100066: cat_r_Claw_ctrl
-    100068: cat_r_Claw_ctrl 1
-    100070: Cat_r_Ear1_bone
-    100072: Cat_r_Ear2-nub_bone
-    100074: Cat_r_Ear2_bone
-    100076: Cat_r_Femur_bone
-    100078: Cat_r_Humerus_bone
-    100080: Cat_r_LipB_bone
-    100082: Cat_r_LipF_bone
-    100084: Cat_r_LipM_bone
-    100086: Cat_r_Metacarpals_bone
-    100088: Cat_r_Metatarsals_bone
-    100090: Cat_r_Pelvis_bone
-    100092: Cat_r_Phalanges_bone
-    100094: Cat_r_Phalanges_bone 1
-    100096: Cat_r_Scapula_bone
-    100098: Cat_r_Tibia_bone
-    100100: Cat_r_Ulna_bone
-    100102: Cat_r_Wrist_bone
-    100104: Cat_Skull_bone
-    100106: Cat_Snout-nub_bone
-    100108: Cat_Snout_bone
-    100110: Cat_Spine1_bone
-    100112: Cat_Spine2_bone
-    100114: Cat_Spine3_bone
-    100116: Cat_Spine4_bone
-    100118: Cat_Spine5_bone
-    100120: Cat_Spine6_bone
-    100122: Cat_Spine7_bone
-    100124: Cat_Tail10_bone
-    100126: Cat_Tail11_bone
-    100128: Cat_Tail12_bone
-    100130: Cat_Tail13_bone
-    100132: Cat_Tail14_bone
-    100134: Cat_Tail15_bone
-    100136: Cat_Tail16_bone
-    100138: Cat_Tail17_bone
-    100140: Cat_Tail1_bone
-    100142: Cat_Tail2_bone
-    100144: Cat_Tail3_bone
-    100146: Cat_Tail4_bone
-    100148: Cat_Tail5_bone
-    100150: Cat_Tail6_bone
-    100152: Cat_Tail7_bone
-    100154: Cat_Tail8_bone
-    100156: Cat_Tail9_bone
-    100158: Cat_Thorax_bone
-    100160: FrontLegController_L
-    100162: FrontLegController_R
-    100164: GeneralController
-    100166: HindLegController_L
-    100168: HindLegController_R
-    100170: IK Chain001
-    100172: IK Chain002
-    100174: IK Chain003
-    100176: IK Chain004
-    100178: IK Chain005
-    100180: IK Chain006
-    100182: IK Chain007
-    100184: IK Chain008
-    100186: IK Chain009
-    100188: IK Chain010
-    100190: IK Chain011
-    100192: IK Chain012
-    100194: IK Chain013
-    100196: IK Chain014
-    100198: IK Chain015
-    100200: Lower
-    100202: MouthController
-    100204: Point001
-    100206: Point002
-    100208: Point003
-    100210: Point004
-    100212: Point005
-    100214: Point006
-    100216: Point007
-    100218: Point008
-    100220: Point009
-    100222: Point010
-    100224: Point011
-    100226: Point012
-    100228: Point013
-    100230: Point014
-    100232: Point015
-    100234: Point016
-    100236: Upper
-    400000: Cat
-    400002: //RootNode
-    400004: Cat_Caudal_bone
-    400006: Cat_l_Ankle_bone
-    400008: Cat_l_Ankle_ctrl
-    400010: cat_l_Claw_ctrl
-    400012: Cat_l_Ear1_bone
-    400014: Cat_l_Ear2-nub_bone
-    400016: Cat_l_Ear2_bone
-    400018: Cat_l_Femur_bone
-    400020: Cat_l_Humerus_bone
-    400022: Cat_l_LipB_bone
-    400024: Cat_l_LipF_bone
-    400026: Cat_l_LipM_bone
-    400028: Cat_l_Metacarpals_bone
-    400030: Cat_l_Metatarsals_bone
-    400032: Cat_l_Pelvis_bone
-    400034: Cat_l_Phalanges_bone
-    400036: Cat_l_Phalanges_bone 1
-    400038: Cat_l_Scapula_bone
-    400040: Cat_l_Tibia_bone
-    400042: Cat_l_Ulna_bone
-    400044: Cat_l_Wrist_bone
-    400046: Cat_Mandible2-nub_bone
-    400048: Cat_Mandible2_bone
-    400050: Cat_Mandible_bone
-    400052: Cat_Neck1_bone
-    400054: Cat_Neck2_bone
-    400056: Cat_Neck3_bone
-    400058: Cat_Neck4_bone
-    400060: Cat_Neck5_bone
-    400062: Cat_Neck_bone
-    400064: Cat_r_Ankle_bone
-    400066: cat_r_Claw_ctrl
-    400068: cat_r_Claw_ctrl 1
-    400070: Cat_r_Ear1_bone
-    400072: Cat_r_Ear2-nub_bone
-    400074: Cat_r_Ear2_bone
-    400076: Cat_r_Femur_bone
-    400078: Cat_r_Humerus_bone
-    400080: Cat_r_LipB_bone
-    400082: Cat_r_LipF_bone
-    400084: Cat_r_LipM_bone
-    400086: Cat_r_Metacarpals_bone
-    400088: Cat_r_Metatarsals_bone
-    400090: Cat_r_Pelvis_bone
-    400092: Cat_r_Phalanges_bone
-    400094: Cat_r_Phalanges_bone 1
-    400096: Cat_r_Scapula_bone
-    400098: Cat_r_Tibia_bone
-    400100: Cat_r_Ulna_bone
-    400102: Cat_r_Wrist_bone
-    400104: Cat_Skull_bone
-    400106: Cat_Snout-nub_bone
-    400108: Cat_Snout_bone
-    400110: Cat_Spine1_bone
-    400112: Cat_Spine2_bone
-    400114: Cat_Spine3_bone
-    400116: Cat_Spine4_bone
-    400118: Cat_Spine5_bone
-    400120: Cat_Spine6_bone
-    400122: Cat_Spine7_bone
-    400124: Cat_Tail10_bone
-    400126: Cat_Tail11_bone
-    400128: Cat_Tail12_bone
-    400130: Cat_Tail13_bone
-    400132: Cat_Tail14_bone
-    400134: Cat_Tail15_bone
-    400136: Cat_Tail16_bone
-    400138: Cat_Tail17_bone
-    400140: Cat_Tail1_bone
-    400142: Cat_Tail2_bone
-    400144: Cat_Tail3_bone
-    400146: Cat_Tail4_bone
-    400148: Cat_Tail5_bone
-    400150: Cat_Tail6_bone
-    400152: Cat_Tail7_bone
-    400154: Cat_Tail8_bone
-    400156: Cat_Tail9_bone
-    400158: Cat_Thorax_bone
-    400160: FrontLegController_L
-    400162: FrontLegController_R
-    400164: GeneralController
-    400166: HindLegController_L
-    400168: HindLegController_R
-    400170: IK Chain001
-    400172: IK Chain002
-    400174: IK Chain003
-    400176: IK Chain004
-    400178: IK Chain005
-    400180: IK Chain006
-    400182: IK Chain007
-    400184: IK Chain008
-    400186: IK Chain009
-    400188: IK Chain010
-    400190: IK Chain011
-    400192: IK Chain012
-    400194: IK Chain013
-    400196: IK Chain014
-    400198: IK Chain015
-    400200: Lower
-    400202: MouthController
-    400204: Point001
-    400206: Point002
-    400208: Point003
-    400210: Point004
-    400212: Point005
-    400214: Point006
-    400216: Point007
-    400218: Point008
-    400220: Point009
-    400222: Point010
-    400224: Point011
-    400226: Point012
-    400228: Point013
-    400230: Point014
-    400232: Point015
-    400234: Point016
-    400236: Upper
-    4300000: Cat
-    7400000: attack
-    9500000: //RootNode
-    13700000: Cat
+  serializedVersion: 22200
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: Cat
+  - first:
+      1: 100002
+    second: //RootNode
+  - first:
+      1: 100004
+    second: Cat_Caudal_bone
+  - first:
+      1: 100006
+    second: Cat_l_Ankle_bone
+  - first:
+      1: 100008
+    second: Cat_l_Ankle_ctrl
+  - first:
+      1: 100010
+    second: cat_l_Claw_ctrl
+  - first:
+      1: 100012
+    second: Cat_l_Ear1_bone
+  - first:
+      1: 100014
+    second: Cat_l_Ear2-nub_bone
+  - first:
+      1: 100016
+    second: Cat_l_Ear2_bone
+  - first:
+      1: 100018
+    second: Cat_l_Femur_bone
+  - first:
+      1: 100020
+    second: Cat_l_Humerus_bone
+  - first:
+      1: 100022
+    second: Cat_l_LipB_bone
+  - first:
+      1: 100024
+    second: Cat_l_LipF_bone
+  - first:
+      1: 100026
+    second: Cat_l_LipM_bone
+  - first:
+      1: 100028
+    second: Cat_l_Metacarpals_bone
+  - first:
+      1: 100030
+    second: Cat_l_Metatarsals_bone
+  - first:
+      1: 100032
+    second: Cat_l_Pelvis_bone
+  - first:
+      1: 100034
+    second: Cat_l_Phalanges_bone
+  - first:
+      1: 100036
+    second: Cat_l_Phalanges_bone 1
+  - first:
+      1: 100038
+    second: Cat_l_Scapula_bone
+  - first:
+      1: 100040
+    second: Cat_l_Tibia_bone
+  - first:
+      1: 100042
+    second: Cat_l_Ulna_bone
+  - first:
+      1: 100044
+    second: Cat_l_Wrist_bone
+  - first:
+      1: 100046
+    second: Cat_Mandible2-nub_bone
+  - first:
+      1: 100048
+    second: Cat_Mandible2_bone
+  - first:
+      1: 100050
+    second: Cat_Mandible_bone
+  - first:
+      1: 100052
+    second: Cat_Neck1_bone
+  - first:
+      1: 100054
+    second: Cat_Neck2_bone
+  - first:
+      1: 100056
+    second: Cat_Neck3_bone
+  - first:
+      1: 100058
+    second: Cat_Neck4_bone
+  - first:
+      1: 100060
+    second: Cat_Neck5_bone
+  - first:
+      1: 100062
+    second: Cat_Neck_bone
+  - first:
+      1: 100064
+    second: Cat_r_Ankle_bone
+  - first:
+      1: 100066
+    second: cat_r_Claw_ctrl
+  - first:
+      1: 100068
+    second: cat_r_Claw_ctrl 1
+  - first:
+      1: 100070
+    second: Cat_r_Ear1_bone
+  - first:
+      1: 100072
+    second: Cat_r_Ear2-nub_bone
+  - first:
+      1: 100074
+    second: Cat_r_Ear2_bone
+  - first:
+      1: 100076
+    second: Cat_r_Femur_bone
+  - first:
+      1: 100078
+    second: Cat_r_Humerus_bone
+  - first:
+      1: 100080
+    second: Cat_r_LipB_bone
+  - first:
+      1: 100082
+    second: Cat_r_LipF_bone
+  - first:
+      1: 100084
+    second: Cat_r_LipM_bone
+  - first:
+      1: 100086
+    second: Cat_r_Metacarpals_bone
+  - first:
+      1: 100088
+    second: Cat_r_Metatarsals_bone
+  - first:
+      1: 100090
+    second: Cat_r_Pelvis_bone
+  - first:
+      1: 100092
+    second: Cat_r_Phalanges_bone
+  - first:
+      1: 100094
+    second: Cat_r_Phalanges_bone 1
+  - first:
+      1: 100096
+    second: Cat_r_Scapula_bone
+  - first:
+      1: 100098
+    second: Cat_r_Tibia_bone
+  - first:
+      1: 100100
+    second: Cat_r_Ulna_bone
+  - first:
+      1: 100102
+    second: Cat_r_Wrist_bone
+  - first:
+      1: 100104
+    second: Cat_Skull_bone
+  - first:
+      1: 100106
+    second: Cat_Snout-nub_bone
+  - first:
+      1: 100108
+    second: Cat_Snout_bone
+  - first:
+      1: 100110
+    second: Cat_Spine1_bone
+  - first:
+      1: 100112
+    second: Cat_Spine2_bone
+  - first:
+      1: 100114
+    second: Cat_Spine3_bone
+  - first:
+      1: 100116
+    second: Cat_Spine4_bone
+  - first:
+      1: 100118
+    second: Cat_Spine5_bone
+  - first:
+      1: 100120
+    second: Cat_Spine6_bone
+  - first:
+      1: 100122
+    second: Cat_Spine7_bone
+  - first:
+      1: 100124
+    second: Cat_Tail10_bone
+  - first:
+      1: 100126
+    second: Cat_Tail11_bone
+  - first:
+      1: 100128
+    second: Cat_Tail12_bone
+  - first:
+      1: 100130
+    second: Cat_Tail13_bone
+  - first:
+      1: 100132
+    second: Cat_Tail14_bone
+  - first:
+      1: 100134
+    second: Cat_Tail15_bone
+  - first:
+      1: 100136
+    second: Cat_Tail16_bone
+  - first:
+      1: 100138
+    second: Cat_Tail17_bone
+  - first:
+      1: 100140
+    second: Cat_Tail1_bone
+  - first:
+      1: 100142
+    second: Cat_Tail2_bone
+  - first:
+      1: 100144
+    second: Cat_Tail3_bone
+  - first:
+      1: 100146
+    second: Cat_Tail4_bone
+  - first:
+      1: 100148
+    second: Cat_Tail5_bone
+  - first:
+      1: 100150
+    second: Cat_Tail6_bone
+  - first:
+      1: 100152
+    second: Cat_Tail7_bone
+  - first:
+      1: 100154
+    second: Cat_Tail8_bone
+  - first:
+      1: 100156
+    second: Cat_Tail9_bone
+  - first:
+      1: 100158
+    second: Cat_Thorax_bone
+  - first:
+      1: 100160
+    second: FrontLegController_L
+  - first:
+      1: 100162
+    second: FrontLegController_R
+  - first:
+      1: 100164
+    second: GeneralController
+  - first:
+      1: 100166
+    second: HindLegController_L
+  - first:
+      1: 100168
+    second: HindLegController_R
+  - first:
+      1: 100170
+    second: IK Chain001
+  - first:
+      1: 100172
+    second: IK Chain002
+  - first:
+      1: 100174
+    second: IK Chain003
+  - first:
+      1: 100176
+    second: IK Chain004
+  - first:
+      1: 100178
+    second: IK Chain005
+  - first:
+      1: 100180
+    second: IK Chain006
+  - first:
+      1: 100182
+    second: IK Chain007
+  - first:
+      1: 100184
+    second: IK Chain008
+  - first:
+      1: 100186
+    second: IK Chain009
+  - first:
+      1: 100188
+    second: IK Chain010
+  - first:
+      1: 100190
+    second: IK Chain011
+  - first:
+      1: 100192
+    second: IK Chain012
+  - first:
+      1: 100194
+    second: IK Chain013
+  - first:
+      1: 100196
+    second: IK Chain014
+  - first:
+      1: 100198
+    second: IK Chain015
+  - first:
+      1: 100200
+    second: Lower
+  - first:
+      1: 100202
+    second: MouthController
+  - first:
+      1: 100204
+    second: Point001
+  - first:
+      1: 100206
+    second: Point002
+  - first:
+      1: 100208
+    second: Point003
+  - first:
+      1: 100210
+    second: Point004
+  - first:
+      1: 100212
+    second: Point005
+  - first:
+      1: 100214
+    second: Point006
+  - first:
+      1: 100216
+    second: Point007
+  - first:
+      1: 100218
+    second: Point008
+  - first:
+      1: 100220
+    second: Point009
+  - first:
+      1: 100222
+    second: Point010
+  - first:
+      1: 100224
+    second: Point011
+  - first:
+      1: 100226
+    second: Point012
+  - first:
+      1: 100228
+    second: Point013
+  - first:
+      1: 100230
+    second: Point014
+  - first:
+      1: 100232
+    second: Point015
+  - first:
+      1: 100234
+    second: Point016
+  - first:
+      1: 100236
+    second: Upper
+  - first:
+      4: 400000
+    second: Cat
+  - first:
+      4: 400002
+    second: //RootNode
+  - first:
+      4: 400004
+    second: Cat_Caudal_bone
+  - first:
+      4: 400006
+    second: Cat_l_Ankle_bone
+  - first:
+      4: 400008
+    second: Cat_l_Ankle_ctrl
+  - first:
+      4: 400010
+    second: cat_l_Claw_ctrl
+  - first:
+      4: 400012
+    second: Cat_l_Ear1_bone
+  - first:
+      4: 400014
+    second: Cat_l_Ear2-nub_bone
+  - first:
+      4: 400016
+    second: Cat_l_Ear2_bone
+  - first:
+      4: 400018
+    second: Cat_l_Femur_bone
+  - first:
+      4: 400020
+    second: Cat_l_Humerus_bone
+  - first:
+      4: 400022
+    second: Cat_l_LipB_bone
+  - first:
+      4: 400024
+    second: Cat_l_LipF_bone
+  - first:
+      4: 400026
+    second: Cat_l_LipM_bone
+  - first:
+      4: 400028
+    second: Cat_l_Metacarpals_bone
+  - first:
+      4: 400030
+    second: Cat_l_Metatarsals_bone
+  - first:
+      4: 400032
+    second: Cat_l_Pelvis_bone
+  - first:
+      4: 400034
+    second: Cat_l_Phalanges_bone
+  - first:
+      4: 400036
+    second: Cat_l_Phalanges_bone 1
+  - first:
+      4: 400038
+    second: Cat_l_Scapula_bone
+  - first:
+      4: 400040
+    second: Cat_l_Tibia_bone
+  - first:
+      4: 400042
+    second: Cat_l_Ulna_bone
+  - first:
+      4: 400044
+    second: Cat_l_Wrist_bone
+  - first:
+      4: 400046
+    second: Cat_Mandible2-nub_bone
+  - first:
+      4: 400048
+    second: Cat_Mandible2_bone
+  - first:
+      4: 400050
+    second: Cat_Mandible_bone
+  - first:
+      4: 400052
+    second: Cat_Neck1_bone
+  - first:
+      4: 400054
+    second: Cat_Neck2_bone
+  - first:
+      4: 400056
+    second: Cat_Neck3_bone
+  - first:
+      4: 400058
+    second: Cat_Neck4_bone
+  - first:
+      4: 400060
+    second: Cat_Neck5_bone
+  - first:
+      4: 400062
+    second: Cat_Neck_bone
+  - first:
+      4: 400064
+    second: Cat_r_Ankle_bone
+  - first:
+      4: 400066
+    second: cat_r_Claw_ctrl
+  - first:
+      4: 400068
+    second: cat_r_Claw_ctrl 1
+  - first:
+      4: 400070
+    second: Cat_r_Ear1_bone
+  - first:
+      4: 400072
+    second: Cat_r_Ear2-nub_bone
+  - first:
+      4: 400074
+    second: Cat_r_Ear2_bone
+  - first:
+      4: 400076
+    second: Cat_r_Femur_bone
+  - first:
+      4: 400078
+    second: Cat_r_Humerus_bone
+  - first:
+      4: 400080
+    second: Cat_r_LipB_bone
+  - first:
+      4: 400082
+    second: Cat_r_LipF_bone
+  - first:
+      4: 400084
+    second: Cat_r_LipM_bone
+  - first:
+      4: 400086
+    second: Cat_r_Metacarpals_bone
+  - first:
+      4: 400088
+    second: Cat_r_Metatarsals_bone
+  - first:
+      4: 400090
+    second: Cat_r_Pelvis_bone
+  - first:
+      4: 400092
+    second: Cat_r_Phalanges_bone
+  - first:
+      4: 400094
+    second: Cat_r_Phalanges_bone 1
+  - first:
+      4: 400096
+    second: Cat_r_Scapula_bone
+  - first:
+      4: 400098
+    second: Cat_r_Tibia_bone
+  - first:
+      4: 400100
+    second: Cat_r_Ulna_bone
+  - first:
+      4: 400102
+    second: Cat_r_Wrist_bone
+  - first:
+      4: 400104
+    second: Cat_Skull_bone
+  - first:
+      4: 400106
+    second: Cat_Snout-nub_bone
+  - first:
+      4: 400108
+    second: Cat_Snout_bone
+  - first:
+      4: 400110
+    second: Cat_Spine1_bone
+  - first:
+      4: 400112
+    second: Cat_Spine2_bone
+  - first:
+      4: 400114
+    second: Cat_Spine3_bone
+  - first:
+      4: 400116
+    second: Cat_Spine4_bone
+  - first:
+      4: 400118
+    second: Cat_Spine5_bone
+  - first:
+      4: 400120
+    second: Cat_Spine6_bone
+  - first:
+      4: 400122
+    second: Cat_Spine7_bone
+  - first:
+      4: 400124
+    second: Cat_Tail10_bone
+  - first:
+      4: 400126
+    second: Cat_Tail11_bone
+  - first:
+      4: 400128
+    second: Cat_Tail12_bone
+  - first:
+      4: 400130
+    second: Cat_Tail13_bone
+  - first:
+      4: 400132
+    second: Cat_Tail14_bone
+  - first:
+      4: 400134
+    second: Cat_Tail15_bone
+  - first:
+      4: 400136
+    second: Cat_Tail16_bone
+  - first:
+      4: 400138
+    second: Cat_Tail17_bone
+  - first:
+      4: 400140
+    second: Cat_Tail1_bone
+  - first:
+      4: 400142
+    second: Cat_Tail2_bone
+  - first:
+      4: 400144
+    second: Cat_Tail3_bone
+  - first:
+      4: 400146
+    second: Cat_Tail4_bone
+  - first:
+      4: 400148
+    second: Cat_Tail5_bone
+  - first:
+      4: 400150
+    second: Cat_Tail6_bone
+  - first:
+      4: 400152
+    second: Cat_Tail7_bone
+  - first:
+      4: 400154
+    second: Cat_Tail8_bone
+  - first:
+      4: 400156
+    second: Cat_Tail9_bone
+  - first:
+      4: 400158
+    second: Cat_Thorax_bone
+  - first:
+      4: 400160
+    second: FrontLegController_L
+  - first:
+      4: 400162
+    second: FrontLegController_R
+  - first:
+      4: 400164
+    second: GeneralController
+  - first:
+      4: 400166
+    second: HindLegController_L
+  - first:
+      4: 400168
+    second: HindLegController_R
+  - first:
+      4: 400170
+    second: IK Chain001
+  - first:
+      4: 400172
+    second: IK Chain002
+  - first:
+      4: 400174
+    second: IK Chain003
+  - first:
+      4: 400176
+    second: IK Chain004
+  - first:
+      4: 400178
+    second: IK Chain005
+  - first:
+      4: 400180
+    second: IK Chain006
+  - first:
+      4: 400182
+    second: IK Chain007
+  - first:
+      4: 400184
+    second: IK Chain008
+  - first:
+      4: 400186
+    second: IK Chain009
+  - first:
+      4: 400188
+    second: IK Chain010
+  - first:
+      4: 400190
+    second: IK Chain011
+  - first:
+      4: 400192
+    second: IK Chain012
+  - first:
+      4: 400194
+    second: IK Chain013
+  - first:
+      4: 400196
+    second: IK Chain014
+  - first:
+      4: 400198
+    second: IK Chain015
+  - first:
+      4: 400200
+    second: Lower
+  - first:
+      4: 400202
+    second: MouthController
+  - first:
+      4: 400204
+    second: Point001
+  - first:
+      4: 400206
+    second: Point002
+  - first:
+      4: 400208
+    second: Point003
+  - first:
+      4: 400210
+    second: Point004
+  - first:
+      4: 400212
+    second: Point005
+  - first:
+      4: 400214
+    second: Point006
+  - first:
+      4: 400216
+    second: Point007
+  - first:
+      4: 400218
+    second: Point008
+  - first:
+      4: 400220
+    second: Point009
+  - first:
+      4: 400222
+    second: Point010
+  - first:
+      4: 400224
+    second: Point011
+  - first:
+      4: 400226
+    second: Point012
+  - first:
+      4: 400228
+    second: Point013
+  - first:
+      4: 400230
+    second: Point014
+  - first:
+      4: 400232
+    second: Point015
+  - first:
+      4: 400234
+    second: Point016
+  - first:
+      4: 400236
+    second: Upper
+  - first:
+      43: 4300000
+    second: Cat
+  - first:
+      74: 7400000
+    second: attack
+  - first:
+      95: 9500000
+    second: //RootNode
+  - first:
+      137: 13700000
+    second: Cat
+  externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
+    materialLocation: 0
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
-    resampleRotations: 1
+    resampleCurves: 1
     optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
     motionNodeName: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
     animationCompression: 1
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
+    extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
       name: attack
       takeName: Take 001
-      firstFrame: 168
-      lastFrame: 226
+      internalID: 0
+      firstFrame: 193
+      lastFrame: 207
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -546,25 +1042,49 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 0
+    importVisibility: 0
     importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    nodeNameCollisionStrategy: 0
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 0
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
     secondaryUVPackMargin: 4
     useFileScale: 1
+    strictVertexDataChecks: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
+    normalCalculationMode: 0
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -574,19 +1094,20 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: GeneralController
     hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
+  importBlendShapeDeformPercent: 0
+  remapMaterialsIfMaterialImportModeIsNone: 1
   additionalBone: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 46731
-  packageName: Black Cat Animated
-  packageVersion: 5.3.8p2
-  assetPath: Assets/Cat/Animations/cat@attack.FBX
-  uploadId: 222678

@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: 7159c332946fc40438bf5c8ab884f46c
-AssetOrigin:
-  serializedVersion: 1
-  productId: 46731
-  packageName: Black Cat Animated
-  packageVersion: 5.3.8p2
-  assetPath: Assets/Cat/Animations/cat@jumping.FBX
-  uploadId: 222678
+guid: d12f2c97e3cb3744a823829db8236758
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable:
@@ -729,7 +722,7 @@ ModelImporter:
     second: Cat
   - first:
       74: 7400000
-    second: jumping
+    second: attackReady
   - first:
       95: 9500000
     second: //RootNode
@@ -764,11 +757,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: jumping
+      name: attackReady
       takeName: Take 001
       internalID: 0
-      firstFrame: 75
-      lastFrame: 105
+      firstFrame: 168
+      lastFrame: 193
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -776,10 +769,10 @@ ModelImporter:
       loop: 0
       hasAdditiveReferencePose: 0
       loopTime: 0
-      loopBlend: 1
-      loopBlendOrientation: 1
-      loopBlendPositionY: 1
-      loopBlendPositionXZ: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
       keepOriginalPositionXZ: 0
@@ -1035,7 +1028,7 @@ ModelImporter:
         weight: 1
       maskType: 0
       maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 75
+      additiveReferencePoseFrame: 168
     isReadable: 1
   meshes:
     lODScreenPercentages: []
